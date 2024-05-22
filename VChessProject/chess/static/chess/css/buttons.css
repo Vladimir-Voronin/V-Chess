@@ -1,0 +1,25 @@
+@import url('colors.css');
+
+button {}
+
+.big-button {
+    background-color: var(--v_green);
+    border-radius: 10px;
+    color: white;
+    padding: 5px;
+    width: 100%;
+    font-size: 18px;
+    border: none;
+    box-shadow: 0 3px var(--v_green_shadow);
+}
+
+.big-button:hover {
+    background-color: var(--v_dark_green);
+    cursor: pointer;
+}
+
+.big-button:active {
+    background-color: var(--v_dark_green);
+    box-shadow: 0 3px var(--v_green_shadow);
+    transform: translateY(2px);
+}

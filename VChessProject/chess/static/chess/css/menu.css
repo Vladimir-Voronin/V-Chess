@@ -1,0 +1,59 @@
+@import url('colors.css');
+
+.left-menu {
+    background-color: var(--v_grey_left_menu);
+    display: flex;
+    flex-direction: column;
+    min-width: 100px;
+    font-weight: 700;
+}
+
+.top-menu-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.bottom-menu-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+}
+
+.menu-item {
+    text-decoration: none;
+    color: var(--v_white_text);
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.menu-item:hover {
+    background-color: var(--v_grey_addit_menu);
+}
+
+.menu-item:visited {
+    color: var(--v_white_text);
+}
+
+.menu-item-bottom {
+    font-size: 14px;
+    color: var(--v_grey_text);
+}
+
+.menu-item-bottom:visited {
+    color: var(--v_grey_text);
+}
+
+.menu-item-text {
+    margin-left: 8px;
+}
+
+.margin-left-icon {
+    margin-left: 15px;
+}
+
+.right-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}

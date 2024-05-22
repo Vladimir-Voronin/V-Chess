@@ -1,0 +1,44 @@
+{% extends 'chess/base/base.html' %}
+{% load static %}
+
+{% block stylesheets %}
+  <link type="text/css" href="{% static 'chess/css/menu.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block body %}
+  <div class="left-menu">
+    <div class="top-menu-container">
+      <a class="menu-item menu-item-top" href="">
+        <i class="fa-solid fa-right-to-bracket margin-left-icon"></i>
+        <div class="menu-item-text">First</div>
+      </a>
+      <a class="menu-item menu-item-top" href="">
+        <i class="fa-solid fa-right-to-bracket margin-left-icon"></i>
+        <div class="menu-item-text">First</div>
+      </a>
+      <a class="menu-item menu-item-top" href="">
+        <i class="fa-solid fa-right-to-bracket margin-left-icon"></i>
+        <div class="menu-item-text">First</div>
+      </a>
+    </div>
+    <div class="bottom-menu-container">
+      <a class="menu-item menu-item-bottom" href="">
+        <i class="fa-solid fa-right-to-bracket margin-left-icon"></i>
+        <div class="menu-item-text">First</div>
+      </a>
+      <a class="menu-item menu-item-bottom" href="">
+        <i class="fa-solid fa-right-to-bracket margin-left-icon"></i>
+        <div class="menu-item-text">First</div>
+      </a>
+      <a class="menu-item menu-item-bottom" href="{% url 'chess:sign_up' %}">
+        <i class="fa-solid fa-right-to-bracket margin-left-icon"></i>
+        <div class="menu-item-text">Sign up</div>
+      </a>
+    </div>
+  </div>
+  <div class="right-container">
+    {% block right_container %}
+
+    {% endblock %}
+  </div>
+{% endblock %}
