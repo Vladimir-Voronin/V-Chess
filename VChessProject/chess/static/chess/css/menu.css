@@ -57,3 +57,21 @@
     justify-content: center;
     width: 100%;
 }
+
+.icon-red {
+    color: red;
+}
+
+.icon-blue {
+    color: blue;
+}
+
+.icon-green {
+    color: var(--v_green);
+}
+
+.png-icon {
+    background-color: white;
+    width: 20px;
+    margin-left: 15px;
+}
