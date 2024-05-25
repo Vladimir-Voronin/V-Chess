@@ -1,0 +1,80 @@
+@import url('colors.css');
+
+.board-view-column {
+    background-color: var(--v_grey_background);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.board-top-row {
+    display: flex;
+    height: 60px;
+    background-color: green;
+}
+
+.board-chess-board-row {
+    background-color: red;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.board-bottom-row {
+    display: flex;
+    height: 60px;
+    background-color: yellow;
+    justify-content: center;
+}
+
+.right-menu-column {
+    background-color: var(--v_grey_addit_menu);
+    flex: 1;
+}
+
+#chessboard {
+    display: flex;
+    flex-direction: row;
+    background-color: rgb(1, 225, 255);
+    width: 500px;
+    height: 500px;
+    flex-wrap: wrap;
+}
+
+.chess-square {}
+
+.dark-square {
+    background-color: var(--v_green);
+}
+
+.light-square {
+    background-color: white;
+}
+
+.dark-square-shadow {
+    box-shadow: 0px 0px 0px 4px var(--chess_board-dark_squares_shadow) inset;
+}
+
+.light-square-shadow {
+    box-shadow: 0px 0px 0px 4px var(--chess_board-light_squares_shadow) inset;
+}
+
+.piece-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.piece-size {
+    height: 100%;
+    width: 100%;
+}
+
+.piece-dummy {
+    position: fixed;
+}
+
+.piece-dummy:hover {
+    cursor: grabbing !important;
+}
