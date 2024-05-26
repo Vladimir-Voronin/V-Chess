@@ -1,3 +1,4 @@
-from django.db import models
+import random
 
-# Create your models here.
+from django.core.exceptions import ValidationError
+from django.db import models

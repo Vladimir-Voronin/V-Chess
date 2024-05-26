@@ -11,6 +11,6 @@
 
     --chess_board_light_squares: white;
     --chess_board_dark_squares: #81B64C;
-    --chess_board-light_squares_shadow: #FCFCD2;
-    --chess_board-dark_squares_shadow: #FCFCD2;
+    --chess_board-light_squares_shadow: #e9e9e9;
+    --chess_board-dark_squares_shadow: #e9e9e9;
 }

@@ -14,7 +14,6 @@
 }
 
 .board-chess-board-row {
-    background-color: red;
     justify-content: center;
     align-items: center;
     display: flex;
@@ -36,13 +35,17 @@
 #chessboard {
     display: flex;
     flex-direction: row;
-    background-color: rgb(1, 225, 255);
+    background-color: var(--v_green_shadow);
     width: 500px;
     height: 500px;
     flex-wrap: wrap;
 }
 
-.chess-square {}
+.chess-square {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .dark-square {
     background-color: var(--v_green);
@@ -69,6 +72,12 @@
 .piece-size {
     height: 100%;
     width: 100%;
+    user-drag: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
 
 .piece-dummy {
@@ -77,4 +86,27 @@
 
 .piece-dummy:hover {
     cursor: grabbing !important;
+}
+
+.move-hint-empty {
+    height: 25%;
+    width: 25%;
+    color: #bbb;
+    background-color: green;
+    opacity: 50%;
+    border-radius: 50%;
+}
+
+.move-hint-eat-piece {
+    height: 25%;
+    width: 25%;
+    color: #bbb;
+    background-color: green;
+    opacity: 50%;
+    border-radius: 50%;
+}
+
+.move-hint-eat-piece2 {
+    border-radius: 30%;
+    border-color: black;
 }

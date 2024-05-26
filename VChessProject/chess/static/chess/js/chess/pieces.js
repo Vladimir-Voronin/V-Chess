@@ -1,5 +1,4 @@
 const path_to_pieces = path_pieces_standard;
-console.log(path_to_pieces);
 const pawn_w_element = `<div class="piece-wrapper"><img class="piece-size" src="${path_to_pieces}/pawn-w.svg"></img></div>`;
 const knight_w_element = `<div class="piece-wrapper"><img class="piece-size" src="${path_to_pieces}/knight-w.svg"></img></div>`;
 const bishop_w_element = `<div class="piece-wrapper"><img class="piece-size" src="${path_to_pieces}/bishop-w.svg"></img></div>`;
