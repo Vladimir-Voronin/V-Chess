@@ -1,0 +1,36 @@
+{% extends 'chess/default_layout.html' %}
+{% load static %}
+
+{% block title %}
+ Board Analysis
+{% endblock %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <link type="text/css" href="{% static 'chess/css/buttons.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'chess/css/chess.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block right_container %}
+  <div class="board-view-column">
+    <div class="board-top-row"></div>
+    <div class="board-chess-board-row">
+        <div class="chess-board" id="chessboard">
+
+        </div>
+    </div>
+    <div class="board-bottom-row"></div>
+  </div>
+
+  <div class="right-menu-column">
+  </div>
+
+  {% include 'chess/parts/import_pieces_js.html' %}
+
+  <script src="{% static 'chess/js/chess/pieces.js' %}" defer></script>
+  <script src="{% static 'chess/js/chess/chess_pieces_logic.js' %}" defer></script>
+  <script src="{% static 'chess/js/chess/chess_game_animations.js' %}" defer></script>
+  <script src="{% static 'chess/js/chess/chess_game.js' %}" defer></script>
+  <script src="{% static 'chess/js/chess/positions.js' %}" defer></script>
+  <script src="{% static 'chess/js/board.js' %}" defer></script>
+{% endblock %}

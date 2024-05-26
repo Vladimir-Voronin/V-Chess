@@ -1,0 +1,22 @@
+@import url('colors.css');
+
+HTML {
+    height: 100%;
+    overflow: auto;
+}
+
+body {
+    margin: 0px;
+    background-color: var(--v_grey_background);
+    color: white;
+
+    font-size: 18px;
+    font-family: 'Roboto', normal;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+.main-container {
+    display: flex;
+    min-height: 100vh;
+}

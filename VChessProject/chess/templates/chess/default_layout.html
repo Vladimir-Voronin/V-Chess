@@ -1,0 +1,54 @@
+{% extends 'chess/base/base.html' %}
+{% load static %}
+
+{% block stylesheets %}
+  <link type="text/css" href="{% static 'chess/css/menu.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block body %}
+  <div class="left-menu">
+    <div class="top-menu-container">
+      <a class="menu-item menu-item-top" href="">
+        <i class="fa-solid fa-right-to-bracket margin-left-icon"></i>
+        <div class="menu-item-text">Home</div>
+      </a>
+      <a class="menu-item menu-item-top" href="">
+        <i class="fa-solid fa-right-to-bracket margin-left-icon"></i>
+        <div class="menu-item-text">Play</div>
+      </a>
+      <a class="menu-item menu-item-top" href="{% url 'chess:board' %}">
+        <img src="{% static 'chess/img/icons/board.png' %}" class="png-icon" />
+        <div class="menu-item-text">Board</div>
+      </a>
+    </div>
+
+    <div class="bottom-menu-container">
+      {% if user.is_authenticated %}
+        <a class="menu-item menu-item-bottom" href="">
+          <i class="fa-solid fa-chess-pawn margin-left-icon icon-green" style="font-size: 120%;
+                        margin-right: 4px;"></i>
+          <div class="menu-item-text">My Account</div>
+        </a>
+        <a class="menu-item menu-item-bottom" href="{% url 'chess:log-out' %}">
+          <i class="fa-solid fa-plug-circle-xmark margin-left-icon icon-red" style="margin-bottom: 2px;
+                     font-size: 110%;"></i>
+          <div class="menu-item-text">Log out</div>
+        </a>
+      {% else %}
+        <a class="menu-item menu-item-bottom" href="{% url 'chess:log-in' %}">
+          <i class="fa-solid fa-right-to-bracket margin-left-icon"></i>
+          <div class="menu-item-text">Log In</div>
+        </a>
+        <a class="menu-item menu-item-bottom" href="{% url 'chess:sign_up' %}">
+          <i class="fa-solid fa-right-to-bracket margin-left-icon"></i>
+          <div class="menu-item-text">Sign up</div>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="right-container">
+    {% block right_container %}
+
+    {% endblock %}
+  </div>
+{% endblock %}

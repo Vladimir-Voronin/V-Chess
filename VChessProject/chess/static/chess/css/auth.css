@@ -1,0 +1,44 @@
+@import url('colors.css');
+
+.sign-up-field {
+    background-color: var(--v_grey_addit_menu);
+    border-radius: 20px;
+    padding: 5px 20px 20px 20px;
+    margin-top: 100px;
+    min-height: 100px;
+    align-self: flex-start;
+    text-align: center;
+    width: 300px;
+}
+
+.auth-row {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.auth-label {
+    font-weight: 200;
+    color: var(--v_grey_text);
+}
+
+.input-field {
+    width: 100%;
+    margin-left: 5px;
+    background-color: var(--v_grey_input_background);
+    border: 1px var(--v_grey_left_menu);
+    border-radius: 3px;
+    padding: 5px;
+    color: white;
+}
+
+.input-field:focus {
+    outline: none;
+}
+
+.auth-error {
+    color: red;
+    text-align: start;
+    margin-left: 15px;
+    margin-bottom:10px;
+    font-size: 16px;
+}
