@@ -50,7 +50,8 @@ class Knight extends ChessPiece {
         ]
         shift_combinations.forEach(shift => {
             const potential_square = get_square_coord_shift(chess_square, shift[0], shift[1]);
-            if (!(potential_square in current_position) || current_position[potential_square].is_white !== this.is_white) {
+            if (potential_square && 
+                (!(potential_square in current_position) || current_position[potential_square].is_white !== this.is_white)) {
                 available_leads.add(potential_square);
             }
         })
