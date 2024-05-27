@@ -1,11 +1,11 @@
 const chess_board_element = document.querySelector("#chessboard");
 
-chess_board = new ChessBoard(chess_board_element);
-chess_board.create_board();
+chess_board1 = new ChessBoard(chess_board_element, path_to_pieces);
+chess_board1.create_board();
 
-chess_game = new ChessGame(chess_board);
+chess_game1 = new ChessGame(chess_board1);
 
-chess_game.set_figure_start_position(start_position,
+chess_game1.set_figure_start_position(test_promotion,
     true, true, true, true
 );
-chess_game.start_game_from_current_position();
+chess_game1.start_game_from_current_position();

@@ -64,3 +64,38 @@ const test_position_1 = {
     "h7": new Pawn(pawn_b_element, false),
     "e5": new Knight(knight_b_element, false),
 }
+
+const test_promotion = {
+    "a1": new Rook(rook_w_element, true),
+    "b1": new Knight(knight_w_element, true),
+    "c1": new Bishop(bishop_w_element, true),
+    "d1": new Queen(queen_w_element, true),
+    "e1": new King(king_w_element, true),
+    "f1": new Bishop(bishop_w_element, true),
+    "g1": new Knight(knight_w_element, true),
+    "h1": new Rook(rook_w_element, true),
+    "a2": new Pawn(pawn_w_element, true),
+    "b2": new Pawn(pawn_w_element, true),
+    "c2": new Pawn(pawn_w_element, true),
+    "d2": new Pawn(pawn_w_element, true),
+    "g7": new Pawn(pawn_w_element, true),
+    "f2": new Pawn(pawn_w_element, true),
+    "g2": new Pawn(pawn_w_element, true),
+    "h2": new Pawn(pawn_w_element, true),
+
+    "a8": new Rook(rook_b_element, false),
+    "b8": new Knight(knight_b_element, false),
+    "c8": new Bishop(bishop_b_element, false),
+    "d8": new Queen(queen_b_element, false),
+    "e8": new King(king_b_element, false),
+    "f8": new Bishop(bishop_b_element, false),
+    "g8": new Knight(knight_b_element, false),
+    "h8": new Rook(rook_b_element, false),
+    "a7": new Pawn(pawn_b_element, false),
+    "b7": new Pawn(pawn_b_element, false),
+    "c7": new Pawn(pawn_b_element, false),
+    "d7": new Pawn(pawn_b_element, false),
+    "e7": new Pawn(pawn_b_element, false),
+    "f7": new Pawn(pawn_b_element, false),
+    "h7": new Pawn(pawn_b_element, false)
+}

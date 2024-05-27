@@ -35,9 +35,9 @@
 #chessboard {
     display: flex;
     flex-direction: row;
-    background-color: var(--v_green_shadow);
-    width: 500px;
-    height: 500px;
+    background-color: var(--v_dark_green);
+    width: 700px;
+    height: 700px;
     flex-wrap: wrap;
 }
 
@@ -109,4 +109,14 @@
 .move-hint-eat-piece2 {
     border-radius: 30%;
     border-color: black;
+}
+
+.div-buttons-wrapper {
+    display: flex;
+    position: fixed;
+    flex-direction: column;
+}
+
+.chess-promoted-button {
+    background-color: var(--promoted_squares_background);
 }

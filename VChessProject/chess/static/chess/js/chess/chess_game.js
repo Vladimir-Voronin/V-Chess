@@ -1,8 +1,15 @@
-// making chess board
 class ChessBoard {
-    constructor(chess_board_element) {
-        this.chess_board_element = chess_board_element
+    constructor(chess_board_element, path_to_pieces) {
+        this.chess_board_element = chess_board_element;
+        this.path_to_pieces = path_to_pieces;
         this.coord_square_dict = {};
+        this.chess_game = null;
+        this.from_coord = null;
+        this.to_coord = null;
+        this.is_animation = false;
+        this.square_from = null;
+        this.square_over = null;
+
     }
 
     create_board() {
@@ -26,12 +33,15 @@ class ChessBoard {
                 this.coord_square_dict[new_square.getAttribute("square-id")] = new_square;
             }
         }
-
+        var self = this
         const all_squares = document.querySelectorAll("#chessboard .chess-square");
-
         all_squares.forEach(square => {
-            square.addEventListener('mousedown', squareMouseDown);
-            square.addEventListener('mouseover', squareMouseOver);
+            square.addEventListener('mousedown', function (e) {
+                self.squareMouseDown(e);
+            });
+            square.addEventListener('mouseover', function (e) {
+                self.squareMouseOver(e);
+            });
             square.addEventListener('mouseout', squareMouseOut);
         })
     }
@@ -45,11 +55,185 @@ class ChessBoard {
         const square_element = this.coord_square_dict[coord];
         square_element.innerHTML = null;
     }
+
+    squareMouseDown(e) {
+        // check if square has a piece
+        if (e.target.tagName !== "IMG")
+            return false;
+        this._remove_promote_buttons();
+        const current_choosen_piece = e.target;
+
+        // take the start coordinate of square
+        this.square_from = current_choosen_piece.parentNode.parentNode;
+        const current_square_id = this.square_from.getAttribute("square-id");
+        // check if you may lead with this piece
+        if (!(check_availability_to_move(current_square_id, this.chess_game)))
+            return;
+
+        addSquareShadow(this.square_from);
+        this.from_coord = current_square_id
+
+        showAvailableMovesHints(current_square_id, this.chess_game);
+
+        // create a dummy of a piece for animation purpose
+        const piece_dummy = current_choosen_piece.cloneNode();
+        piece_dummy.classList.remove("piece-size");
+        piece_dummy.classList.add("piece-dummy");
+        piece_dummy.style.width = current_choosen_piece.clientWidth + "px";
+        piece_dummy.style.height = current_choosen_piece.clientHeight + "px";
+
+        // make real piece invisible when we drag its dummy
+        current_choosen_piece.style.visibility = 'hidden';
+        var self = this;
+        document.onmousemove = function (e) {
+            self.moveAt(piece_dummy, e);
+        }
+        document.body.append(piece_dummy);
+        this.moveAt(piece_dummy, e);
+
+        self = this;
+        piece_dummy.onmouseup = function () {
+            document.onmousemove = null;
+            piece_dummy.onmouseup = null;
+            piece_dummy.remove();
+            if (self.square_over)
+                self.to_coord = getSquareCoordinates(self.square_over);
+
+            if (self.to_coord) {
+                self.chess_game.make_move(self.from_coord, self.to_coord);
+            }
+            removeSquareShadow(self.square_from);
+            removeSquareShadow(self.square_over);
+            self.square_from = null;
+            self.square_over = null;
+
+            removeAvailableMovesHints(self.chess_game);
+
+            // if lead - change location of a piece (FUTURE)
+            current_choosen_piece.style.visibility = 'visible';
+
+            self.is_animation = false;
+        }
+
+        piece_dummy.ondragstart = function () {
+            return false;
+        };
+    }
+
+    squareMouseOver(e) {
+        if (e.target.tagName === "IMG") {
+            if (!this.is_animation) {
+                // Check if we can lead with this piece
+                if ((check_availability_to_move(e.target.parentNode.parentNode.getAttribute("square-id"),
+                    this.chess_game)))
+                    e.target.style.cursor = 'grab';
+            }
+        }
+    }
+
+    moveAt(dummy, e) {
+        dummy.style.left = e.pageX - dummy.offsetWidth / 2 + 'px';
+        dummy.style.top = e.pageY - dummy.offsetHeight / 2 + 'px';
+
+        var elements = document.elementsFromPoint(e.pageX, e.pageY)
+        let on_board_flag = false;
+        elements.forEach(elem => {
+            if (elem.classList.contains("chess-square")) {
+                on_board_flag = true;
+                if (elem !== this.square_over) {
+                    if (this.square_over !== this.square_from)
+                        removeSquareShadow(this.square_over);
+                    this.square_over = elem;
+                    addSquareShadow(this.square_over);
+                }
+            }
+        });
+        if (!on_board_flag) {
+            removeSquareShadow(this.square_over);
+            this.square_over = null;
+            this.to_coord = null;
+        }
+    }
+
+    create_promote_buttons(initital_square, move_square) {
+        console.log("Creating promition buttons");
+        const is_white = move_square[1] === "8" ? true : false;
+        const div_buttons_wrapper = document.createElement("div");
+        div_buttons_wrapper.classList.add("div-buttons-wrapper");
+        const queen_button = this._create_button(new Queen(null, null), is_white,
+            initital_square, move_square);
+        div_buttons_wrapper.appendChild(queen_button);
+        const rook_button = this._create_button(new Rook(null, null), is_white,
+            initital_square, move_square);
+        div_buttons_wrapper.appendChild(rook_button);
+        const knight_button = this._create_button(new Knight(null, null), is_white,
+            initital_square, move_square);
+        div_buttons_wrapper.appendChild(knight_button);
+        const bishop_button = this._create_button(new Bishop(null, null), is_white,
+            initital_square, move_square);
+        div_buttons_wrapper.appendChild(bishop_button);
+        document.body.append(div_buttons_wrapper);
+
+        // move it to specific field
+        const bodyRect = document.body.getBoundingClientRect();
+        const elemRect = this.coord_square_dict[move_square].getBoundingClientRect();
+        const centerX = elemRect.top - bodyRect.top;
+        const centerY = elemRect.left - bodyRect.left;
+        const offset = this.coord_square_dict[move_square].clientWidth / 2;
+        div_buttons_wrapper.style.top = centerX + offset + "px";
+        div_buttons_wrapper.style.left = centerY + offset + "px";
+
+        if (is_white) {
+            div_buttons_wrapper.style["flex-direction"] = "column"
+        }
+        else {
+            div_buttons_wrapper.style["flex-direction"] = "column-reverse"
+            div_buttons_wrapper.style.top = centerX + offset -
+                4 * this.coord_square_dict[move_square].clientWidth + "px";
+        }
+    }
+
+    _remove_promote_buttons() {
+        const to_delete = document.getElementsByClassName('div-buttons-wrapper');
+
+        while (to_delete[0]) {
+            to_delete[0].parentNode.removeChild(to_delete[0]);
+        }
+    }
+
+    _create_button(piece_class, is_white, initial_square, move_square) {
+        const button = document.createElement("div");
+        button.classList.add("chess-promoted-button");
+        button.style.width = this.coord_square_dict["a1"].clientWidth + "px";
+        button.style.height = this.coord_square_dict["a1"].clientHeight + "px";
+        console.log(piece_class);
+        const piece = piece_class.return_basic_piece(this.path_to_pieces, is_white);
+        button.innerHTML = piece.element;
+
+        button.addEventListener("click", (function (e) {
+            this._click_promotion_button(e, initial_square, move_square, is_white, piece.constructor.name);
+        }).bind(this))
+        return button;
+    }
+
+    _click_promotion_button(e, initial_square, move_square, is_white, piece_type) {
+        const classes_dict = {
+            "Queen": new Queen(null, null).return_basic_piece(this.path_to_pieces, is_white),
+            "Rook": new Rook(null, null).return_basic_piece(this.path_to_pieces, is_white),
+            "Knight": new Knight(null, null).return_basic_piece(this.path_to_pieces, is_white),
+            "Bishop": new Bishop(null, null).return_basic_piece(this.path_to_pieces, is_white),
+        }
+        const promoted = classes_dict[piece_type];
+        this.chess_game.make_move(initial_square, move_square,
+            promoted);
+        this._remove_promote_buttons();
+    }
 }
 
 class ChessGame {
     constructor(chess_board) {
         this.chess_board = chess_board;
+        this.chess_board.chess_game = this;
         this.current_position = null;
         this.move_turn_white = true;
         this.available_moves_dict = {};
@@ -86,11 +270,27 @@ class ChessGame {
         this._update_available_moves();
     }
 
-    make_move(initial_square, move_square) {
+    make_move(initial_square, move_square, promoted_piece = null) {
         if (this.available_moves_dict[initial_square].has(move_square)) {
             // en passant handling
             this._update_if_en_passant(initial_square, move_square);
             this._en_passant_active_check_and_set(initial_square, move_square);
+
+            // Promotion
+            if (this._is_trying_to_promote(initial_square, move_square)) {
+                if (promoted_piece) {
+                    this.current_position = this._make_new_position(initial_square, move_square);
+                    this.current_position[move_square] = promoted_piece;
+                    this.chess_board.remove_piece_element(initial_square);
+                    console.log(promoted_piece);
+                    this.chess_board.add_piece_element(promoted_piece.element, move_square);
+                }
+                else {
+                    console.log("No promoted piece");
+                    this.chess_board.create_promote_buttons(initial_square, move_square);
+                    return;
+                }
+            }
 
             // check for castles availability
             this._castle_possible_check(initial_square,);
@@ -98,15 +298,28 @@ class ChessGame {
                 this._make_castle(initial_square, move_square);
             }
 
+            // Current_position change
             const current_piece = this.current_position[initial_square];
-            this.current_position = this._make_new_position(initial_square, move_square);
+            if (current_piece) {
+                this.current_position = this._make_new_position(initial_square, move_square);
 
-            this.chess_board.remove_piece_element(initial_square);
-            this.chess_board.add_piece_element(current_piece.element, move_square);
+                this.chess_board.remove_piece_element(initial_square);
+                this.chess_board.add_piece_element(current_piece.element, move_square);
+            }
 
             this.move_turn_white = !this.move_turn_white;
             this._update_available_moves();
         }
+    }
+
+    _is_trying_to_promote(initial_square, move_square) {
+        const target_square_check_suffix = this.move_turn_white ? "8" : "1";
+        if (this.current_position[initial_square] instanceof Pawn &&
+            move_square[1] === target_square_check_suffix
+        ) {
+            return true;
+        }
+        return false;
     }
 
     _update_available_moves() {
