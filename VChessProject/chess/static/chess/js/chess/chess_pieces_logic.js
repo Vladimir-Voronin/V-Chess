@@ -34,6 +34,17 @@ class Pawn extends ChessPiece {
         }
         return available_leads;
     }
+
+    get_en_passant_move(piece_square, potential_en_passant) {
+        const sign = this.is_white ? 1 : -1;
+        const diag_1_1 = get_square_coord_shift(piece_square, 1, sign);
+        const diag_m1_1 = get_square_coord_shift(piece_square, -1, sign);
+        if (potential_en_passant === diag_1_1 ||
+            potential_en_passant === diag_m1_1
+        ) {
+            return potential_en_passant;
+        }
+    }
 }
 
 class Knight extends ChessPiece {
@@ -50,7 +61,7 @@ class Knight extends ChessPiece {
         ]
         shift_combinations.forEach(shift => {
             const potential_square = get_square_coord_shift(chess_square, shift[0], shift[1]);
-            if (potential_square && 
+            if (potential_square &&
                 (!(potential_square in current_position) || current_position[potential_square].is_white !== this.is_white)) {
                 available_leads.add(potential_square);
             }

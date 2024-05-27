@@ -57,19 +57,25 @@ class ChessGame {
         this.is_white_0_0_0_possible = true;
         this.is_black_0_0_possible = true;
         this.is_black_0_0_0_possible = true;
+        this.is_en_passant = false;
+        this.en_passant_square = null;
     }
-    
+
     set_figure_start_position(position,
         is_white_0_0_possible = false,
         is_white_0_0_0_possible = false,
         is_black_0_0_possible = false,
-        is_black_0_0_0_possible = false
+        is_black_0_0_0_possible = false,
+        is_en_passant = false,
+        en_passant_square = null
     ) {
         this.current_position = position
         this.is_white_0_0_possible = is_white_0_0_possible;
         this.is_white_0_0_0_possible = is_white_0_0_0_possible;
         this.is_black_0_0_possible = is_black_0_0_possible;
         this.is_black_0_0_0_possible = is_black_0_0_0_possible;
+        this.is_en_passant = is_en_passant;
+        this.en_passant_square = en_passant_square;
         for (var [key, value] of Object.entries(this.current_position)) {
             this.chess_board.add_piece_element(value.element, key);
         }
@@ -82,6 +88,10 @@ class ChessGame {
 
     make_move(initial_square, move_square) {
         if (this.available_moves_dict[initial_square].has(move_square)) {
+            // en passant handling
+            this._update_if_en_passant(initial_square, move_square);
+            this._en_passant_active_check_and_set(initial_square, move_square);
+
             // check for castles availability
             this._castle_possible_check(initial_square,);
             if (this._is_move_castle(initial_square, move_square)) {
@@ -108,6 +118,7 @@ class ChessGame {
                 this.available_moves_dict[square_coord] = piece.get_available_moves(square_coord,
                     this.current_position)
                 this._update_available_moves_for_castle(square_coord, piece);
+                this._update_available_moves_for_en_passant(square_coord, piece);
             }
         }
 
@@ -147,14 +158,28 @@ class ChessGame {
 
     }
 
+    _en_passant_active_check_and_set(initial_square, move_square) {
+        if (this.current_position[initial_square] instanceof Pawn &&
+            Math.abs(Number(move_square[1]) - Number(initial_square[1])) === 2) {
+            this.is_en_passant = true;
+            this.en_passant_square = initial_square[0] + String((Number(move_square[1]) +
+                Number(initial_square[1])) / 2);
+        }
+        else {
+            this.is_en_passant = false;
+            this.en_passant_square = null;
+        }
+    }
+
     _exclude_castle_if_under_check(squares_under_attack) {
         const king_position = this._find_king_position(this.current_position, this.move_turn_white);
-        console.log(king_position);
         if (squares_under_attack.has(get_square_coord_shift(king_position, 1, 0) ||
-        squares_under_attack.has(get_square_coord_shift(king_position, 2, 0)))) {
-            console.log("Yes 1");
-            console.log(squares_under_attack);
+            squares_under_attack.has(get_square_coord_shift(king_position, 2, 0)))) {
             this.available_moves_dict[king_position].delete(get_square_coord_shift(king_position, 2, 0))
+        }
+        if (squares_under_attack.has(get_square_coord_shift(king_position, -1, 0) ||
+            squares_under_attack.has(get_square_coord_shift(king_position, -2, 0)))) {
+            this.available_moves_dict[king_position].delete(get_square_coord_shift(king_position, -2, 0))
         }
     }
 
@@ -175,6 +200,32 @@ class ChessGame {
                 this.is_black_0_0_0_possible
             );
             this.available_moves_dict[square_coord] = this.available_moves_dict[square_coord].union(result);
+        }
+    }
+
+    _update_available_moves_for_en_passant(square_coord, piece) {
+        if (piece instanceof Pawn && this.is_en_passant) {
+            const make_en_passant = piece.get_en_passant_move(square_coord, this.en_passant_square);
+            if (make_en_passant)
+                this.available_moves_dict[square_coord].add(make_en_passant);
+        }
+    }
+
+    _update_if_en_passant(initial_square, move_square) {
+        if (this.current_position[initial_square] instanceof Pawn &&
+            !(move_square in this.current_position) &&
+            initial_square[0] !== move_square[0]) {
+
+            const delete_piece_prefix = move_square[0];
+            let delete_piece_square = null;
+            if (move_square[1] === "3")
+                delete_piece_square = delete_piece_prefix + "4";
+            else
+                delete_piece_square = delete_piece_prefix + "5";
+
+            delete this.current_position[delete_piece_square];
+            this.chess_board.remove_piece_element(delete_piece_square);
+
         }
     }
 
