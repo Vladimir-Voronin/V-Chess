@@ -2,12 +2,26 @@
 
 .board-view-column {
     background-color: var(--v_grey_background);
-    flex: 1;
     display: flex;
     flex-direction: column;
+    margin-top: 15px;
 }
 
-.board-top-row {
+.empty-column-board-left {
+    flex: 1;
+    display: flex;
+    max-width: 250px;
+    min-width: 10px;
+}
+
+.empty-column-board-right {
+    flex: 1;
+    display: flex;
+    max-width: 40px;
+    min-width: 5px;
+}
+
+.board-black-row {
     display: flex;
     height: 60px;
     background-color: green;
@@ -20,7 +34,7 @@
     justify-content: center;
 }
 
-.board-bottom-row {
+.board-white-row {
     display: flex;
     height: 60px;
     background-color: yellow;
@@ -78,6 +92,7 @@
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
+    cursor: grab;
 }
 
 .piece-dummy {

@@ -121,14 +121,15 @@ class ChessBoard {
     }
 
     squareMouseOver(e) {
-        if (e.target.tagName === "IMG") {
-            if (!this.is_animation) {
-                // Check if we can lead with this piece
-                if ((check_availability_to_move(e.target.parentNode.parentNode.getAttribute("square-id"),
-                    this.chess_game)))
-                    e.target.style.cursor = 'grab';
-            }
-        }
+        // Takes out that 
+        // if (e.target.tagName === "IMG") {
+        //     if (!this.is_animation) {
+        //         // Check if we can lead with this piece
+        //         if ((check_availability_to_move(e.target.parentNode.parentNode.getAttribute("square-id"),
+        //             this.chess_game)))
+        //             e.target.style.cursor = 'grab';
+        //     }
+        // }
     }
 
     moveAt(dummy, e) {
