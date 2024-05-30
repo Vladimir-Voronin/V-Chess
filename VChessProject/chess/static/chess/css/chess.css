@@ -24,7 +24,6 @@
 .board-black-row {
     display: flex;
     height: 60px;
-    background-color: green;
 }
 
 .board-chess-board-row {
@@ -37,13 +36,52 @@
 .board-white-row {
     display: flex;
     height: 60px;
-    background-color: yellow;
-    justify-content: center;
 }
 
-.right-menu-column {
-    background-color: var(--v_grey_addit_menu);
-    flex: 1;
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    align-self: center;
+    padding: 3px;
+}
+
+.user-data {
+    font-size: 14px;
+    padding: 8px 2px 0px 5px;
+}
+
+.timer-black {
+    background-color: var(--timer_black_not_active);
+    color: var(--timer_black_not_active_text);
+    text-align: right;
+    font-size: 22px;
+    width: 150px;
+    height: 35px;
+    padding-right: 6px;
+    margin: auto 2px auto auto;
+    border-radius: 4px;
+    user-select: none;
+}
+
+.time-black-active {
+    background-color: var(--timer_black_active);
+}
+
+.timer-white {
+    background-color: var(--timer_white_not_active);
+    color: var(--timer_white_not_active_text);
+    text-align: right;
+    font-size: 22px;
+    width: 150px;
+    height: 35px;
+    padding-right: 6px;
+    margin: auto 2px auto auto;
+    border-radius: 4px;
+    user-select: none;
+}
+
+.time-white-active {
+    background-color: var(--timer_white_active);
 }
 
 #chessboard {

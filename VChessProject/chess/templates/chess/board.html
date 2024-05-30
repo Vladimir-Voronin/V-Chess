@@ -12,15 +12,32 @@
 {% endblock %}
 
 {% block right_container %}
+  <div class="empty-column-board-left"></div>
   <div class="board-view-column">
-    <div class="board-top-row"></div>
-    <div class="board-chess-board-row">
-        <div class="chess-board" id="chessboard">
-
-        </div>
+    <div class="board-black-row">
+      <div class="user-avatar">
+        <img src="{% static 'chess/img/icons/no_avatar.png' %}" class="png-icon" />
+      </div>
+      <div class="user-data">
+        <a>Black</a>
+      </div>
+      <div class="timer-black">3:00</div>
     </div>
-    <div class="board-bottom-row"></div>
+    <div class="board-chess-board-row">
+      <div class="chess-board" id="chessboard"></div>
+    </div>
+    <div class="board-white-row">
+      <div class="user-avatar">
+        <img src="{% static 'chess/img/icons/no_avatar.png' %}" class="png-icon" />
+      </div>
+      <div class="user-data">
+        <a>White</a>
+      </div>
+      <div class="timer-white">3:00</div>
+    </div>
   </div>
+
+  <div class="empty-column-board-right"></div>
 
   <div class="right-menu-column">
   </div>

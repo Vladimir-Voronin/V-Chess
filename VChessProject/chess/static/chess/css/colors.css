@@ -9,6 +9,13 @@
     --v_grey_text: #8C8B89;
     --v_grey_input_background: #3C3B39;
 
+    --timer_black_not_active: #141413;
+    --timer_black_not_active_text: #82817F;
+    --timer_black_active: #262522;
+    --timer_white_not_active: #989795;
+    --timer_white_not_active_text: #82817F;
+    --timer_white_active: #ffffff;
+
     --chess_board_light_squares: white;
     --chess_board_dark_squares: #81B64C;
     --chess_board-light_squares_shadow: #e9e9e9;
