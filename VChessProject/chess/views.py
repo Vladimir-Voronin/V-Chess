@@ -8,6 +8,9 @@ from django.views import View
 from django.views.generic import TemplateView, FormView
 
 from .forms import SignUpForm, LoginForm
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def base_page(request):
@@ -37,6 +40,7 @@ class LogInView(FormView):
     template_name = Path("chess/log_in.html")
 
     def get_success_url(self):
+        logger.info("You successfully logged in")
         return reverse('chess:home_page')
 
     def form_valid(self, form):
@@ -57,4 +61,3 @@ def logout_view(request):
 
 class BoardView(TemplateView):
     template_name = Path("chess/board.html")
-
