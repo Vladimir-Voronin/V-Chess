@@ -10,7 +10,7 @@
 .empty-column-board-left {
     flex: 1;
     display: flex;
-    max-width: 250px;
+    max-width: 100px;
     min-width: 10px;
 }
 
@@ -27,8 +27,8 @@
 }
 
 .board-chess-board-row {
-    justify-content: center;
-    align-items: center;
+    justify-content: start;
+    align-items: start;
     display: flex;
     justify-content: center;
 }
@@ -91,6 +91,11 @@
     width: 700px;
     height: 700px;
     flex-wrap: wrap;
+}
+
+.flip-chessboard {
+    flex-direction: row-reverse !important;
+    flex-wrap: wrap-reverse !important;
 }
 
 .chess-square {
@@ -181,19 +186,23 @@
 
 .right-menu-column {
     background-color: var(--v_grey_background);
-    flex: 1;
-    justify-content: center;
-
+    display: flex;
+    flex-direction: column;
+    width: 400px;
 }
 
 .right-menu-container {
     display: flex;
-    width: 400px;
     height: 800px;
+    max-height: 800px;
     background-color: var(--right-menu-background);
     margin-top: 15px;
     margin-left: 15px;
     flex-direction: column;
+}
+
+.right-menu-content {
+    overflow: auto;
 }
 
 .right-menu-buttons-container {
@@ -232,6 +241,8 @@
     display: flex;
     flex-direction: column;
     font-size: 16px;
+    overflow-y: auto;
+    overflow-x: hidden;
     font-weight: 400;
 }
 
@@ -259,12 +270,48 @@
 .notation-body {
     display: flex;
     flex-direction: column;
+
 }
 
 .notation-row {
     display: flex;
     flex: 1;
     min-height: 30px;
+}
+
+.notation-row-branch {
+    display: flex;
+    flex: 1;
+    min-height: 20px;
+    background-color: var(--right_menu_button_active_background);
+    border-top: 1px solid rgb(151, 151, 151);
+    border-bottom: 1px solid rgb(151, 151, 151);
+    font-size: 13px;
+    user-select: none;
+    padding-left: 10px;
+    padding-right: 10px;
+    color: var(--not_active_text_dark);
+    flex-wrap: wrap;
+}
+
+.move-number-branch {
+    padding-left: 2px;
+}
+
+.move-notation-branch {
+    padding-left: 3px;
+}
+
+.move-notation-branch.active {
+    background-color: #3a5974;
+    color: var(--v_white_text);
+    font-weight: 700;
+}
+
+.move-notation-branch:hover {
+    background-color: #4480b1;
+    color: var(--v_white_text);
+    cursor: pointer;
 }
 
 .move-number {
@@ -286,7 +333,60 @@
     align-items: center;
 }
 
+.move-notation.active {
+    background-color: #3a5974;
+    color: var(--v_white_text);
+    font-weight: 700;
+}
+
 .move-notation:hover {
-    background-color: var(--notation_hover_background);
+    background-color: #4480b1;
+    color: var(--v_white_text);
     cursor: pointer;
+}
+
+.under-menu-buttons-container {
+    display: flex;
+    flex-direction: row;
+    padding-left: 15px;
+    width: 385px;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+    padding-top: 5px;
+}
+
+.move-button {
+    background-color: var(--v_grey_addit_menu);
+    width: 100px;
+    height: 35px;
+    margin: 2px;
+    border-radius: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: var(--not_active_text_lighter1);
+}
+
+.move-button:hover {
+    background-color: var(--right_menu_button_active_background);
+    color: var(--v_white_text);
+    cursor: pointer;
+}
+
+.board-buttons-container {
+    display: flex;
+    flex-direction: column;
+    width: 20px;
+    background-color: red;
+    height: 100px;
+}
+
+.board-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 20px;
+    font-size: 12px;
 }

@@ -99,3 +99,16 @@ const test_promotion = {
     "f7": new Pawn(pawn_b_element, false),
     "h7": new Pawn(pawn_b_element, false)
 }
+
+const test_position_2 = {
+    "e2": new King(king_w_element, true),
+    "f1": new Bishop(bishop_w_element, true),
+    "f3": new Knight(knight_w_element, true),
+    "a2": new Pawn(pawn_w_element, true),
+    "h3": new Pawn(pawn_w_element, true),
+
+    "c8": new King(king_b_element, false),
+    "g4": new Bishop(bishop_b_element, false),
+    "h7": new Pawn(pawn_b_element, false),
+    "e5": new Knight(knight_b_element, false),
+}

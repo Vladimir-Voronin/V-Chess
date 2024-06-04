@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
- Board Analysis
+  Board Analysis
 {% endblock %}
 
 {% block stylesheets %}
@@ -13,38 +13,91 @@
 
 {% block right_container %}
   <div class="empty-column-board-left"></div>
+
   <div class="board-view-column">
-    <div class="board-black-row">
-      <div class="user-avatar">
-        <img src="{% static 'chess/img/icons/no_avatar.png' %}" class="png-icon" />
+    <div class="user-bar-top" id="user_bar_top">
+      <div class="board-black-row">
+        <div class="user-avatar">
+          <img src="{% static 'chess/img/icons/no_avatar.png' %}" class="png-icon" />
+        </div>
+        <div class="user-data">
+          <a>Black</a>
+        </div>
+        <div class="timer-black">3:00</div>
       </div>
-      <div class="user-data">
-        <a>Black</a>
-      </div>
-      <div class="timer-black">3:00</div>
     </div>
+
     <div class="board-chess-board-row">
       <div class="chess-board" id="chessboard"></div>
+      <div class="board-buttons-container">
+        <button class="board-button" id="flip_board_button"><i class="fa-solid fa-repeat"></i></button>
+      </div>
     </div>
-    <div class="board-white-row">
-      <div class="user-avatar">
-        <img src="{% static 'chess/img/icons/no_avatar.png' %}" class="png-icon" />
+    <div class="user-bar-bottom" id="user_bar_bottom">
+      <div class="board-white-row">
+        <div class="user-avatar">
+          <img src="{% static 'chess/img/icons/no_avatar.png' %}" class="png-icon" />
+        </div>
+        <div class="user-data">
+          <a>White</a>
+        </div>
+        <div class="timer-white">3:00</div>
       </div>
-      <div class="user-data">
-        <a>White</a>
-      </div>
-      <div class="timer-white">3:00</div>
     </div>
   </div>
 
   <div class="empty-column-board-right"></div>
 
   <div class="right-menu-column">
+    <div class="right-menu-container">
+      <div class="right-menu-buttons-container">
+        <div class="right-menu-button active" id="notation_button">
+          <span><i class="fa-solid fa-location-crosshairs"></i></span>
+          <span>Notation</span>
+        </div>
+        <div class="right-menu-button" id="play_button">
+          <span><i class="fa-regular fa-square-plus"></i></span>
+          <span>Play</span>
+        </div>
+        <div class="right-menu-button" id="players_button">
+          <span><i class="fa-solid fa-users"></i></span>
+          <span>Players</span>
+        </div>
+      </div>
+      <div class="right-menu-content">
+        <div class="notation-container" id="notation_container">
+          <div class="notation-header">I'm a notation header</div>
+          <div class="notation-body" id="notation_body"></div>
+        </div>
+        <div class="play-container" id="play_container"></div>
+        <div class="players-container" id="players_container"></div>
+      </div>
+
+      <div class="right-menu-floor"></div>
+    </div>
+
+    <div class="under-menu-buttons-container">
+      <div class="move-button" id="first_move_button">
+        <i class="fas fa-backward-fast"></i>
+      </div>
+      <div class="move-button" id="previous_move_button">
+        <i class="fas fa-backward"></i>
+      </div>
+      <div class="move-button" id="next_move_button">
+        <i class="fa-solid fa-forward"></i>
+      </div>
+      <div class="move-button" id="last_main_line_move_button">
+        <i class="fa-solid fa-forward-fast"></i>
+      </div>
+    </div>
   </div>
 
   {% include 'chess/parts/import_pieces_js.html' %}
 
   <script src="{% static 'chess/js/chess/pieces.js' %}" defer></script>
+  <script src="{% static 'chess/js/chess/pgn.js' %}" defer></script>
+  <script src="{% static 'chess/js/chess/right_menu.js' %}" defer></script>
+  <script src="{% static 'chess/js/chess/notation.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/chess_pieces_logic.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/chess_game_functions.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/chess_game.js' %}" defer></script>
