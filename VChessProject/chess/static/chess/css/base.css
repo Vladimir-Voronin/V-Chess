@@ -24,3 +24,35 @@ body {
 span {
     user-select: none;
 }
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: var(--right-menu-background);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--right_menu_button_background);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: black;
+}
+
+button {
+    all: unset;
+    background-color: var(--v_grey_addit_menu);
+    color: var(--not_active_text_lighter1);
+}
+
+button:hover {
+    background-color: var(--right_menu_button_active_background);
+    color: var(--v_white_text);
+    cursor: pointer;
+}
