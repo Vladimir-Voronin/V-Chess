@@ -247,15 +247,60 @@
 }
 
 #notation_container {
-    visibility: hidden;
+    display: none;
 }
 
 #play_container {
-    visibility: hidden;
+    display: none;
 }
 
+.play-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.play-body-row {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.time-control-button {
+    height: 40px;
+    width: 60px;
+    background-color: var(--right_menu_button_background);
+    color: var(--not_active_text_lighter1);
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 5px;
+    margin-right: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.time-control-button.active {
+    color: var(--v_white_text);
+}
+
+.time-control-button:not(.time-control-button.active):hover {
+    cursor: pointer;
+    color: var(--not_active_text_lighter2);
+}
+
+#time_controls_buttons {}
+
 #players_container {
-    visibility: hidden;
+    display: none;
 }
 
 .notation-header {
@@ -270,7 +315,6 @@
 .notation-body {
     display: flex;
     flex-direction: column;
-
 }
 
 .notation-row {

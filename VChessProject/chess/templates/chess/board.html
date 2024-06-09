@@ -55,7 +55,7 @@
           <span><i class="fa-solid fa-location-crosshairs"></i></span>
           <span>Notation</span>
         </div>
-        <div class="right-menu-button" id="play_button">
+        <div class="right-menu-button" id="play_menu_button">
           <span><i class="fa-regular fa-square-plus"></i></span>
           <span>Play</span>
         </div>
@@ -69,7 +69,21 @@
           <div class="notation-header">I'm a notation header</div>
           <div class="notation-body" id="notation_body"></div>
         </div>
-        <div class="play-container" id="play_container"></div>
+        <div class="play-container" id="play_container">
+          <div class="play-body">
+            <div class="play-body-row">Time controls</div>
+
+            <div class="play-body-row" id="time_controls_buttons">
+              <div class="time-control-button" id="timecontrol_3">3 min</div>
+              <div class="time-control-button" id="timecontrol_3_2">3 | 2</div>
+              <div class="time-control-button" id="timecontrol_15">15 min</div>
+            </div>
+            <div class="play-body-row">
+              <button class="big-button" id="play_button">Play</button>
+              <button class="big-button" id="cancel_button">Cancel search</button>
+            </div>
+          </div>
+        </div>
         <div class="players-container" id="players_container"></div>
       </div>
 
@@ -93,7 +107,11 @@
   </div>
 
   {% include 'chess/parts/import_pieces_js.html' %}
-
+  <script>
+    url_ajax_start_search = "{% url 'chess:ajax_start_search' %}"
+    url_ajax_cancel_search = "{% url 'chess:ajax_cancel_search' %}"
+  </script>
+  <script src="{% static 'chess/js/chess/right_menu/play.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/pieces.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/pgn.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/right_menu.js' %}" defer></script>

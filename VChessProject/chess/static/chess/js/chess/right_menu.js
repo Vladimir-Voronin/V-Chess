@@ -7,13 +7,13 @@ class RightMenuBind {
 
     make_not_active() {
         this.button_element.classList.remove("active");
-        this.container_element.style.visibility = "hidden";
+        this.container_element.style.display= "none";
         this.is_active = false;
     }
 
     make_active() {
         this.button_element.classList.add("active");
-        this.container_element.style.visibility = "visible";
+        this.container_element.style.display= "block";
         this.is_active = true;
     }
 }

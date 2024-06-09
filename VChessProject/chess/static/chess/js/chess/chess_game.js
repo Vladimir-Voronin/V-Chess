@@ -362,7 +362,6 @@ class ChessGame {
 
             // notation final update
             this._save_notation_node_after_move(promoted_piece)
-            console.log(this);
         }
     }
 

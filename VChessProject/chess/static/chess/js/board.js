@@ -5,7 +5,7 @@ const notation_bind = new RightMenuBind(
     document.querySelector("#notation_container")
 );
 const play_bind = new RightMenuBind(
-    document.querySelector("#play_button"),
+    document.querySelector("#play_menu_button"),
     document.querySelector("#play_container")
 );
 const players_bind = new RightMenuBind(
