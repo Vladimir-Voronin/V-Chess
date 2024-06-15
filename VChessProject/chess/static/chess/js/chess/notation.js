@@ -289,12 +289,6 @@ class NotationView {
         chess_game.resume_game_from_notation_node(notation_node);
     }
 
-    get_notation_data(move_number, is_white) {
-        const search_string = `[is_white="${is_white}"][move_number="${move_number}"]`;
-        const move_notation = document.querySelector(search_string);
-        return move_notation;
-    }
-
     make_notation_active(notation_node, move_notation) {
         this.current_highligted_node = notation_node;
         this.all_move_notation_elements.forEach(elem => {

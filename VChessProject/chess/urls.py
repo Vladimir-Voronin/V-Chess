@@ -10,10 +10,10 @@ urlpatterns = [
     path("board", views.BoardView.as_view(), name="board")
 ]
 
-ajaxpatterns = [
+ajax_patterns = [
     path("ajax_start_search", views.ajax_start_search, name="ajax_start_search"),
     path("ajax_cancel_search", views.ajax_cancel_search, name="ajax_cancel_search"),
     # path("get_ajax", views.get_ajax, name="get_ajax")
 ]
 
-urlpatterns += ajaxpatterns
+urlpatterns += ajax_patterns

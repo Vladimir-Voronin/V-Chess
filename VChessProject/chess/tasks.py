@@ -148,6 +148,11 @@ class PlayerSearchTaskRedis(Task):
         return result
 
 
+def clear_redis():
+    a = PlayerSearchTaskRedis()
+    a.redis_clear()
+
+
 @app.task(base=PlayerSearchTaskRedis, bind=True)
 def start_global_search(self):
     self.search_pares()
