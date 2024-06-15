@@ -99,3 +99,12 @@ def ajax_cancel_search(request):
 
 def ajax_get_match_if_found(request):
     logger.info("Getting match")
+
+
+def ajax_return_new_html_test(request):
+    html = render_to_string("chess/online_game.html")
+    return JsonResponse({"success": True, "new_right_container_html": html})
+
+
+class OnlineGameView(TemplateView):
+    template_name = "chess/online_game.html"

@@ -82,6 +82,12 @@
               <button class="big-button" id="play_button">Play</button>
               <button class="big-button" id="cancel_button">Cancel search</button>
             </div>
+            <div class="play-body-row">
+              <button class="big-button" id="test_button">Test</button>
+            </div>
+            <div class="play-body-row">
+              <button class="big-button" id="test_button"><a href="{% url 'chess:online_game' game_id='1' %}">Test 2</a></button>
+            </div>
           </div>
         </div>
         <div class="players-container" id="players_container"></div>
@@ -110,6 +116,7 @@
   <script>
     url_ajax_start_search = "{% url 'chess:ajax_start_search' %}"
     url_ajax_cancel_search = "{% url 'chess:ajax_cancel_search' %}"
+    url_ajax_return_new_html_test = "{% url 'chess:ajax_return_new_html_test' %}"
   </script>
   <script src="{% static 'chess/js/chess/right_menu/play.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/pieces.js' %}" defer></script>

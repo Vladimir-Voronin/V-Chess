@@ -65,3 +65,21 @@ flip_board_button.addEventListener("click", (e) => {
         document.querySelector("#user_bar_top"),
         document.querySelector("#user_bar_bottom"));
 });
+
+const test_button = document.querySelector("#test_button");
+test_button.addEventListener("click", () => {
+    $.ajax({
+        type: "GET",
+        url: url_ajax_return_new_html_test,
+        contentType: "application/json",
+        dataType: "json",
+        success: function (response) {
+            console.log(response);
+            const right_container = document.querySelector(".right-container");
+            right_container.innerHTML = response.new_right_container_html;
+        },
+        error: function (response) {
+            console.log("error");
+        }
+    });
+});
