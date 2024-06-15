@@ -308,7 +308,7 @@ class ChessGame {
         this.current_notation_node.counter_50_moves_draw = this.counter_50_moves_draw;
         this.current_notation_node.is_en_passant = this.is_en_passant;
         this.current_notation_node.en_passant_square = this.en_passant_square;
-        this.current_notation_node.is_white = this.move_turn_white;
+        this.current_notation_node.is_white = !this.move_turn_white;
         this.current_notation_node.all_positions_count = { ...this.all_positions_count };
     }
 
