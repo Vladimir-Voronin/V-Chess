@@ -358,20 +358,26 @@
     cursor: pointer;
 }
 
+.move-notation-branch-text {}
+
+.move-notation-text {
+    padding-left: 10px;
+}
+
 .move-number {
     width: 40px;
     background-color: var(--right-menu-notation-move-number);
     color: var(--not_active_text_dark);
     user-select: none;
     display: flex;
+    flex: 0 0 12%;
     align-items: center;
     justify-content: center;
 }
 
 .move-notation {
     color: var(--not_active_text_lighter2);
-    flex: 1;
-    padding-left: 10px;
+    flex: 0 0 44%;
     user-select: none;
     display: flex;
     align-items: center;
