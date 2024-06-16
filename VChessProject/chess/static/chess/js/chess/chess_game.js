@@ -313,56 +313,58 @@ class ChessGame {
     }
 
     make_move(initial_square, move_square, promoted_piece = null) {
-        if (this.available_moves_dict[initial_square].has(move_square)) {
-            const position_before_move = { ...this.current_position };
-            // en passant handling
-            this._update_if_en_passant(initial_square, move_square);
-            this._en_passant_active_check_and_set(initial_square, move_square);
-            const is_pawn_move = this.current_position[initial_square].constructor.name === "Pawn";
-            const number_of_pieces_on_board = Object.keys(this.current_position).length;
-            // Promotion
-            if (this._is_trying_to_promote(initial_square, move_square)) {
-                if (promoted_piece) {
-                    this.current_position = this._make_new_position(initial_square, move_square);
-                    this.current_position[move_square] = promoted_piece;
-                    this.chess_board.remove_piece_element(initial_square);
-                    this.chess_board.add_piece_element(promoted_piece.element, move_square);
-                }
-                else {
-                    this.chess_board.create_promote_buttons(initial_square, move_square);
-                    return;
-                }
-            }
-
-            // notation update
-            this._save_notation_node_before_move(initial_square, move_square,
-                position_before_move);
-
-            // check for castles availability
-            this._castle_possible_check(initial_square, move_square);
-            if (this._is_move_castle(initial_square, move_square)) {
-                this._make_castle(initial_square, move_square);
-            }
-
-            // Current_position change
-            const current_piece = this.current_position[initial_square];
-            if (current_piece) {
-                this.current_position = this._make_new_position(initial_square, move_square);
-
-                this.chess_board.remove_piece_element(initial_square);
-                this.chess_board.add_piece_element(current_piece.element, move_square);
-            }
-
-            const piece_has_been_eaten = number_of_pieces_on_board - Object.keys(this.current_position).length;
-
-            this._update_positions_counter();
-            this._update_50_moves_counter(is_pawn_move, piece_has_been_eaten);
-            this.move_turn_white = !this.move_turn_white;
-            this._update_available_moves();
-
-            // notation final update
-            this._save_notation_node_after_move(promoted_piece)
+        if (!this.available_moves_dict[initial_square].has(move_square)) {
+            return;
         }
+
+        const position_before_move = { ...this.current_position };
+        // en passant handling
+        this._update_if_en_passant(initial_square, move_square);
+        this._en_passant_active_check_and_set(initial_square, move_square);
+        const is_pawn_move = this.current_position[initial_square].constructor.name === "Pawn";
+        const number_of_pieces_on_board = Object.keys(this.current_position).length;
+        // Promotion
+        if (this._is_trying_to_promote(initial_square, move_square)) {
+            if (promoted_piece) {
+                this.current_position = this._make_new_position(initial_square, move_square);
+                this.current_position[move_square] = promoted_piece;
+                this.chess_board.remove_piece_element(initial_square);
+                this.chess_board.add_piece_element(promoted_piece.element, move_square);
+            }
+            else {
+                this.chess_board.create_promote_buttons(initial_square, move_square);
+                return;
+            }
+        }
+
+        // notation update
+        this._save_notation_node_before_move(initial_square, move_square,
+            position_before_move);
+
+        // check for castles availability
+        this._castle_possible_check(initial_square, move_square);
+        if (this._is_move_castle(initial_square, move_square)) {
+            this._make_castle(initial_square, move_square);
+        }
+
+        // Current_position change
+        const current_piece = this.current_position[initial_square];
+        if (current_piece) {
+            this.current_position = this._make_new_position(initial_square, move_square);
+
+            this.chess_board.remove_piece_element(initial_square);
+            this.chess_board.add_piece_element(current_piece.element, move_square);
+        }
+
+        const piece_has_been_eaten = number_of_pieces_on_board - Object.keys(this.current_position).length;
+
+        this._update_positions_counter();
+        this._update_50_moves_counter(is_pawn_move, piece_has_been_eaten);
+        this.move_turn_white = !this.move_turn_white;
+        this._update_available_moves();
+
+        // notation final update
+        this._save_notation_node_after_move(promoted_piece);
     }
 
     update_board() {
