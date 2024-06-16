@@ -106,6 +106,9 @@ class NotationNodeTree {
         counter_50_moves_draw,
         initial_notation_node,
         current_notation_node,
+        game_is_end,
+        is_draw,
+        white_won,
         promoted_piece
     ) {
         this.position_after = { ...position_after };
@@ -119,6 +122,9 @@ class NotationNodeTree {
         this.counter_50_moves_draw = counter_50_moves_draw;
         this.initial_notation_node = initial_notation_node;
         this.current_notation_node = current_notation_node;
+        this.game_is_end = game_is_end;
+        this.is_draw = is_draw,
+        this.white_won = white_won;
 
         if (promoted_piece) {
             const piece_shortname_dict = get_piece_shortname_dict();
@@ -149,9 +155,10 @@ class NotationView {
         this.current_highligted_node = current_highligted_node;
     }
 
-    write_new_node(notation_node, chess_game) {
+    is_this_new_main_line_move(notation_node) {
         let is_main_line = false;
         let dummy = notation_node;
+
         while (dummy.parent !== null) {
             dummy = dummy.parent;
         }
@@ -159,9 +166,15 @@ class NotationView {
         while (dummy.children.length > 0 && dummy.children[0] !== null) {
             dummy = dummy.children[0];
         }
+
         if (dummy === notation_node)
             is_main_line = true;
 
+        return is_main_line;
+    }
+
+    write_new_node(notation_node, chess_game) {
+        const is_main_line = this.is_this_new_main_line_move(notation_node)
         // check if this branch already exists
         let element = null;
         let is_already_in_notation = false;
@@ -204,13 +217,19 @@ class NotationView {
             move_number_branch_element.innerHTML = notation_node.move_number + "."
             this.current_row_element.append(move_number_branch_element);
         }
+
         const move_notation_branch_element = document.createElement("div");
         move_notation_branch_element.classList.add("move-notation-branch");
         move_notation_branch_element.setAttribute("is_white", notation_node.is_white);
         move_notation_branch_element.setAttribute("move_number", notation_node.move_number);
-        move_notation_branch_element.innerHTML = notation_node.notation_data;
 
+        const move_notation_text = document.createElement("div");
+        move_notation_text.classList.add("move-notation-branch-text");
+        move_notation_text.innerHTML = notation_node.notation_data;
+
+        move_notation_branch_element.append(move_notation_text);
         this.current_row_element.append(move_notation_branch_element);
+
         move_notation_branch_element.addEventListener("click", ((e) => {
             this.on_notation_click(e, move_notation_branch_element, notation_node, chess_game);
         }).bind(this))
@@ -247,7 +266,12 @@ class NotationView {
         move_notation_branch_element.classList.add("move-notation-branch");
         move_notation_branch_element.setAttribute("is_white", notation_node.is_white);
         move_notation_branch_element.setAttribute("move_number", notation_node.move_number);
-        move_notation_branch_element.innerHTML = notation_node.notation_data;
+
+        const move_notation_text = document.createElement("div");
+        move_notation_text.classList.add("move-notation-branch-text");
+        move_notation_text.innerHTML = notation_node.notation_data;
+
+        move_notation_branch_element.append(move_notation_text);
 
         this.current_row_element.append(move_notation_branch_element);
         move_notation_branch_element.addEventListener("click", ((e) => {
@@ -371,7 +395,11 @@ function create_new_main_move_notation(notation_node) {
     move_notation.classList.add("move-notation");
     move_notation.setAttribute("is_white", notation_node.is_white);
     move_notation.setAttribute("move_number", notation_node.move_number);
-    move_notation.innerHTML += notation_node.notation_data;
+    
+    const move_notation_text = document.createElement("div");
+    move_notation_text.classList.add("move-notation-text");
+    move_notation_text.innerHTML = notation_node.notation_data;
 
+    move_notation.append(move_notation_text);
     return move_notation;
 }

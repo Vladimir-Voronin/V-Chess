@@ -385,6 +385,9 @@ class ChessGame {
         this.initial_notation_node = notation_node.initial_notation_node;
         this.current_notation_node = notation_node.current_notation_node;
         this.move_turn_white = !notation_node.is_white;
+        this.game_is_end = notation_node.game_is_end;
+        this.is_draw = notation_node.is_draw;
+        this.white_won = notation_node.white_won;
 
         this.start_game_from_current_position(this.move_turn_white, false);
     }
@@ -412,6 +415,9 @@ class ChessGame {
             this.counter_50_moves_draw,
             this.initial_notation_node,
             this.current_notation_node,
+            this.game_is_end,
+            this.is_draw,
+            this.white_won,
             promoted_piece
         );
         this.notation_view.write_new_node(this.current_notation_node, this);
@@ -715,7 +721,7 @@ function flip_board(chess_board, top_user_bar_element, bottom_user_bar_element) 
     bottom_user_bar_element.innerHTML = save;
     if (chess_board.chess_board_element.classList.contains("flip-chessboard")) {
         chess_board.chess_board_element.classList.remove("flip-chessboard");
-    } 
+    }
     else {
         chess_board.chess_board_element.classList.add("flip-chessboard");
     }
