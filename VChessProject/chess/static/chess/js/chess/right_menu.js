@@ -39,17 +39,17 @@ class RightMenuView {
 }
 
 function click_next_move(e, chess_game) {
-    chess_game.notation_view.go_to_next_move(chess_game);
+    chess_game.notation.go_to_next_move(chess_game);
 }
 
 function click_previous_move(e, chess_game) {
-    chess_game.notation_view.go_to_previous_move(chess_game);
+    chess_game.notation.go_to_previous_move(chess_game);
 }
 
 function click_last_main_line_move(e, chess_game) {
-    chess_game.notation_view.go_to_last_main_line_move(chess_game);
+    chess_game.notation.go_to_last_main_line_move(chess_game);
 }
 
 function click_first_move(e, chess_game) {
-    chess_game.notation_view.go_to_first_move(chess_game);
+    chess_game.notation.go_to_first_move(chess_game);
 }

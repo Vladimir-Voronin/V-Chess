@@ -16,13 +16,14 @@ const players_bind = new RightMenuBind(
 const right_menu_view = new RightMenuView([notation_bind, play_bind, players_bind]);
 const notation_view = new NotationView(
     document.querySelector("#notation_body")
-)
+);
+const notation = new Notation(null, notation_view);
 
 chess_board1 = new ChessBoard(chess_board_element, path_to_pieces);
 chess_board1.create_board();
 
 chess_game1 = new ChessGame(chess_board1);
-chess_game1.notation_view = notation_view;
+chess_game1.notation = notation;
 
 chess_game1.set_figure_start_position(start_position,
     true, true, true, true

@@ -258,7 +258,7 @@ class ChessGame {
         this.counter_50_moves_draw = 0;
         this.initial_notation_node = null;
         this.current_notation_node = null;
-        this.notation_view = null;
+        this.notation = null;
     }
 
     set_figure_start_position(position,
@@ -422,7 +422,7 @@ class ChessGame {
             this.white_won,
             promoted_piece
         );
-        this.notation_view.write_new_node(this.current_notation_node, this);
+        this.notation.write_new_node(this.current_notation_node, this);
     }
 
     _is_trying_to_promote(initial_square, move_square) {

@@ -124,7 +124,7 @@ class NotationNodeTree {
         this.current_notation_node = current_notation_node;
         this.game_is_end = game_is_end;
         this.is_draw = is_draw,
-        this.white_won = white_won;
+            this.white_won = white_won;
 
         if (promoted_piece) {
             const piece_shortname_dict = get_piece_shortname_dict();
@@ -147,12 +147,10 @@ class NotationNodeTree {
     }
 }
 
-class NotationView {
-    constructor(notation_element, current_highligted_node = null) {
-        this.notation_element = notation_element;
-        this.current_row_element = null;
-        this.all_move_notation_elements = [];
+class Notation {
+    constructor(current_highligted_node = null, notation_view = null) {
         this.current_highligted_node = current_highligted_node;
+        this.notation_view = notation_view;
     }
 
     is_this_new_main_line_move(notation_node) {
@@ -188,9 +186,9 @@ class NotationView {
         if (is_already_in_notation) {
             notation_node = element;
             // Implement if lead the same as a main line
-            this.on_notation_click(null, notation_node.notation_element,
-                notation_node,
-                chess_game);
+            this.go_to_notation_node(notation_node,
+                chess_game,
+                notation_node.notation_element);
             return;
         }
 
@@ -207,7 +205,108 @@ class NotationView {
         }
     }
 
+    go_to_notation_node(notation_node, chess_game, move_notation_elem) {
+        this.current_highligted_node = notation_node;
+        chess_game.resume_game_from_notation_node(notation_node);
+        if (this.notation_view) {
+            if (!move_notation_elem) {
+                this.notation_view.make_the_first_move_active(notation_node);
+                return;
+            }
+            this.notation_view.make_notation_active(notation_node, move_notation_elem);
+        }
+    }
+
+    write_new_main_line(notation_node, chess_game) {
+        if (this.notation_view) {
+            this.notation_view.write_new_main_line(notation_node, chess_game, this);
+        }
+        else {
+            this.go_to_notation_node(notation_node, chess_game, null);
+        }
+    }
+
     write_current_branch_line(notation_node, chess_game) {
+        if (this.notation_view) {
+            this.notation_view.write_current_branch_line(notation_node, chess_game, this);
+        }
+        else {
+            this.go_to_notation_node(notation_node, chess_game, null);
+        }
+    }
+
+    write_new_branch_line(notation_node, chess_game) {
+        if (this.notation_view) {
+            this.notation_view.write_new_branch_line(notation_node, chess_game, this);
+        }
+        else {
+            this.go_to_notation_node(notation_node, chess_game, null);
+        }
+    }
+
+    go_to_next_move(chess_game) {
+        if (!this.current_highligted_node)
+            return;
+        // Implement for tree with choieces in which branch to go [FUTURE]
+        if (this.current_highligted_node.children.length > 0) {
+            const next = this.current_highligted_node.children[0];
+            this.go_to_notation_node(next, chess_game, next.notation_element);
+        }
+    }
+
+    go_to_previous_move(chess_game) {
+        if (!this.current_highligted_node)
+            return;
+        if (!this.current_highligted_node.parent)
+            return;
+        const previous = this.current_highligted_node.parent;
+        this.go_to_notation_node(previous, chess_game, previous.notation_element);
+    }
+
+    go_to_last_main_line_move(chess_game) {
+        if (!this.current_highligted_node) {
+            return;
+        }
+        let dummy = this.current_highligted_node;
+        while (dummy.parent !== null) {
+            dummy = dummy.parent;
+        }
+
+        while (dummy.children.length > 0 && dummy.children[0] !== null) {
+            dummy = dummy.children[0];
+        }
+        this.go_to_notation_node(dummy, chess_game, dummy.notation_element);
+    }
+
+    go_to_first_move(chess_game) {
+        if (!this.current_highligted_node) {
+            return;
+        }
+        let dummy = this.current_highligted_node;
+        while (dummy.parent !== null) {
+            dummy = dummy.parent;
+        }
+        this.go_to_notation_node(dummy, chess_game, dummy.notation_element);
+    }
+}
+
+class NotationView {
+    constructor(notation_element, current_highligted_node = null) {
+        this.notation_element = notation_element;
+        this.current_row_element = null;
+        this.all_move_notation_elements = [];
+        this.current_highligted_node = current_highligted_node;
+    }
+
+    make_the_first_move_active(notation_node) {
+        this.current_row_element = null;
+        this.all_move_notation_elements.forEach(elem => {
+            elem.classList.remove("active");
+        });
+        this.current_highligted_node = notation_node;
+    }
+
+    write_current_branch_line(notation_node, chess_game, notation) {
         const parent_node = notation_node.parent;
         const row_before = parent_node.notation_element.parentElement;
         row_before.after(this.current_row_element);
@@ -231,14 +330,14 @@ class NotationView {
         this.current_row_element.append(move_notation_branch_element);
 
         move_notation_branch_element.addEventListener("click", ((e) => {
-            this.on_notation_click(e, move_notation_branch_element, notation_node, chess_game);
+            this.on_notation_click(e, move_notation_branch_element, notation_node, chess_game, notation);
         }).bind(this))
         this.all_move_notation_elements.push(move_notation_branch_element);
         notation_node.notation_element = move_notation_branch_element;
-        this.make_notation_active(notation_node, move_notation_branch_element);
+        notation.go_to_notation_node(notation_node, chess_game, move_notation_branch_element);
     }
 
-    write_new_branch_line(notation_node, chess_game) {
+    write_new_branch_line(notation_node, chess_game, notation) {
         const new_row_branch = document.createElement("div");
         new_row_branch.classList.add("notation-row-branch");
         this.current_row_element = new_row_branch;
@@ -275,96 +374,40 @@ class NotationView {
 
         this.current_row_element.append(move_notation_branch_element);
         move_notation_branch_element.addEventListener("click", ((e) => {
-            this.on_notation_click(e, move_notation_branch_element, notation_node, chess_game);
+            this.on_notation_click(e, move_notation_branch_element, notation_node, chess_game, notation);
         }).bind(this))
         this.all_move_notation_elements.push(move_notation_branch_element);
         notation_node.notation_element = move_notation_branch_element;
-        this.make_notation_active(notation_node, move_notation_branch_element);
+        notation.go_to_notation_node(notation_node, chess_game, move_notation_branch_element);
     }
 
-    write_new_main_line(notation_node, chess_game) {
+    write_new_main_line(notation_node, chess_game, notation) {
         if (notation_node.is_white) {
             const new_row = create_new_main_row(notation_node);
             this.current_row_element = new_row;
             this.notation_element.append(this.current_row_element);
         }
-        const move_notation = create_new_main_move_notation(notation_node);
-        this.current_row_element.append(move_notation);
-        move_notation.addEventListener("click", ((e) => {
-            this.on_notation_click(e, move_notation, notation_node, chess_game);
+        const move_notation_elem = create_new_main_move_notation_elem(notation_node);
+        this.current_row_element.append(move_notation_elem);
+        move_notation_elem.addEventListener("click", ((e) => {
+            this.on_notation_click(e, move_notation_elem, notation_node, chess_game, notation);
         }).bind(this))
-        this.all_move_notation_elements.push(move_notation);
-        notation_node.notation_element = move_notation;
-        this.make_notation_active(notation_node, move_notation);
+        this.all_move_notation_elements.push(move_notation_elem);
+        notation_node.notation_element = move_notation_elem;
+        notation.go_to_notation_node(notation_node, chess_game, move_notation_elem);
     }
 
-    on_notation_click(e, move_notation, notation_node, chess_game) {
-        if (!move_notation) {
-            this.current_row_element = null;
-            this.all_move_notation_elements.forEach(elem => {
-                elem.classList.remove("active");
-            });
-            this.current_highligted_node = notation_node;
-            chess_game.resume_game_from_notation_node(notation_node);
-            return;
-        }
-        this.current_row_element = move_notation.parentElement;
-        this.make_notation_active(notation_node, move_notation);
-        chess_game.resume_game_from_notation_node(notation_node);
+    on_notation_click(e, move_notation, notation_node, chess_game, notation) {
+        notation.go_to_notation_node(notation_node, chess_game, move_notation);
     }
 
     make_notation_active(notation_node, move_notation) {
+        this.current_row_element = move_notation.parentElement;
         this.current_highligted_node = notation_node;
         this.all_move_notation_elements.forEach(elem => {
             elem.classList.remove("active");
         })
         move_notation.classList.add("active");
-    }
-
-    go_to_next_move(chess_game) {
-        if (!this.current_highligted_node)
-            return;
-        // Implement for tree with choieces in which branch to go [FUTURE]
-        if (this.current_highligted_node.children.length > 0) {
-            const next = this.current_highligted_node.children[0];
-            this.on_notation_click(null, next.notation_element, next, chess_game);
-        }
-    }
-
-    go_to_previous_move(chess_game) {
-        if (!this.current_highligted_node)
-            return;
-        if (!this.current_highligted_node.parent)
-            return;
-        const previous = this.current_highligted_node.parent;
-        this.on_notation_click(null, previous.notation_element, previous, chess_game);
-    }
-
-    go_to_last_main_line_move(chess_game) {
-        if (!this.current_highligted_node) {
-            return;
-        }
-        let dummy = this.current_highligted_node;
-        while (dummy.parent !== null) {
-            dummy = dummy.parent;
-        }
-
-        while (dummy.children.length > 0 && dummy.children[0] !== null) {
-            dummy = dummy.children[0];
-        }
-        this.on_notation_click(null, dummy.notation_element, dummy, chess_game);
-    }
-
-    go_to_first_move(chess_game) {
-        if (!this.current_highligted_node) {
-            return;
-        }
-        let dummy = this.current_highligted_node;
-        while (dummy.parent !== null) {
-            dummy = dummy.parent;
-        }
-        this.on_notation_click(null, dummy.notation_element, dummy, chess_game);
-
     }
 }
 
@@ -390,16 +433,16 @@ function create_new_main_row(notation_node) {
     return new_row;
 }
 
-function create_new_main_move_notation(notation_node) {
-    const move_notation = document.createElement("div");
-    move_notation.classList.add("move-notation");
-    move_notation.setAttribute("is_white", notation_node.is_white);
-    move_notation.setAttribute("move_number", notation_node.move_number);
-    
+function create_new_main_move_notation_elem(notation_node) {
+    const move_notation_elem = document.createElement("div");
+    move_notation_elem.classList.add("move-notation");
+    move_notation_elem.setAttribute("is_white", notation_node.is_white);
+    move_notation_elem.setAttribute("move_number", notation_node.move_number);
+
     const move_notation_text = document.createElement("div");
     move_notation_text.classList.add("move-notation-text");
     move_notation_text.innerHTML = notation_node.notation_data;
 
-    move_notation.append(move_notation_text);
-    return move_notation;
+    move_notation_elem.append(move_notation_text);
+    return move_notation_elem;
 }
