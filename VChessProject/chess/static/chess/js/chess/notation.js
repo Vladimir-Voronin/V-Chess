@@ -2,6 +2,7 @@ class NotationNodeTree {
     constructor(parent_node = null) {
         this.move_number = 0;
         this.notation_data = "";
+        this.uci = "";
         this.is_white = null;
         this.position_after = null;
         this.children = [];
@@ -109,7 +110,9 @@ class NotationNodeTree {
         game_is_end,
         is_draw,
         white_won,
-        promoted_piece
+        promoted_piece,
+        from_square,
+        to_square
     ) {
         this.position_after = { ...position_after };
         this.is_white_0_0_possible = is_white_0_0_possible;
@@ -125,11 +128,13 @@ class NotationNodeTree {
         this.game_is_end = game_is_end;
         this.is_draw = is_draw,
             this.white_won = white_won;
+        this.uci = from_square + to_square
 
         if (promoted_piece) {
             const piece_shortname_dict = get_piece_shortname_dict();
             const shortname = piece_shortname_dict[promoted_piece.constructor.name];
             this.notation_data += "=" + shortname;
+            this.uci += shortname.toLowerCase();
         }
     }
 
@@ -217,12 +222,25 @@ class Notation {
         }
     }
 
-    write_new_main_line(notation_node, chess_game) {
+    write_new_main_line(notation_node, chess_game, move_to_target = true) {
+        this.current_highligted_node = notation_node;
         if (this.notation_view) {
-            this.notation_view.write_new_main_line(notation_node, chess_game, this);
+            this.notation_view.write_new_main_line(notation_node, chess_game, this, move_to_target);
         }
         else {
-            this.go_to_notation_node(notation_node, chess_game, null);
+            if (move_to_target)
+                this.go_to_notation_node(notation_node, chess_game, null);
+        }
+    }
+
+    write_new_main_line_from_server(notation_node, chess_game, move_to_target = true) {
+        this.current_highligted_node = notation_node;
+        if (this.notation_view) {
+            this.notation_view.write_new_main_line(notation_node, chess_game, this, move_to_target);
+        }
+        else {
+            if (move_to_target)
+                this.go_to_notation_node(notation_node, chess_game, null);
         }
     }
 
@@ -287,6 +305,55 @@ class Notation {
             dummy = dummy.parent;
         }
         this.go_to_notation_node(dummy, chess_game, dummy.notation_element);
+    }
+
+    resume_main_line_with_uci_moves(chess_game, all_moves, path_to_pieces) {
+        let dummy = chess_game.current_notation_node;
+
+        while (dummy.parent !== null) {
+            dummy = dummy.parent;
+        }
+        // dummy is a root now
+        let i = 0;
+        let uci_current_move_is_white = true;
+        while (dummy.children.length > 0 && dummy.children[0] !== null) {
+            dummy = dummy.children[0];
+            if (dummy.uci != all_moves[i]) {
+                console.log(`Sync Error. move of client ${dummy.uci} is not equal to server move ${all_moves[i]}`)
+                return;
+            }
+            ++i;
+            uci_current_move_is_white = !uci_current_move_is_white;
+        }
+        let promoted = null;
+        let promoted_piece = null
+        for (let index = i; index < all_moves.length; index++) {
+            const uci_move = all_moves[index];
+            const from_square = uci_move.slice(0, 2);
+            const to_square = uci_move.slice(2, 4);
+            console.log(`from: ${from_square}`);
+            console.log(`to: ${to_square}`);
+
+            const classes_dict = {
+                "q": new Queen(null, null).return_basic_piece(path_to_pieces, uci_current_move_is_white),
+                "r": new Rook(null, null).return_basic_piece(path_to_pieces, uci_current_move_is_white),
+                "n": new Knight(null, null).return_basic_piece(path_to_pieces, uci_current_move_is_white),
+                "b": new Bishop(null, null).return_basic_piece(path_to_pieces, uci_current_move_is_white),
+            }
+
+            if (uci_move.length == 5) {
+                promoted = uci_move[4];
+                promoted_piece = classes_dict[promoted];
+                chess_game.make_move_from_server_to_main_line(from_square, to_square,
+                    promoted_piece);
+            }
+            else {
+                chess_game.make_move_from_server_to_main_line(from_square, to_square);
+            }
+
+            uci_current_move_is_white = !uci_current_move_is_white;
+        }
+        this.go_to_last_main_line_move(chess_game);
     }
 }
 
@@ -381,7 +448,7 @@ class NotationView {
         notation.go_to_notation_node(notation_node, chess_game, move_notation_branch_element);
     }
 
-    write_new_main_line(notation_node, chess_game, notation) {
+    write_new_main_line(notation_node, chess_game, notation, move_to_target = true) {
         if (notation_node.is_white) {
             const new_row = create_new_main_row(notation_node);
             this.current_row_element = new_row;
@@ -394,7 +461,8 @@ class NotationView {
         }).bind(this))
         this.all_move_notation_elements.push(move_notation_elem);
         notation_node.notation_element = move_notation_elem;
-        notation.go_to_notation_node(notation_node, chess_game, move_notation_elem);
+        if (move_to_target)
+            notation.go_to_notation_node(notation_node, chess_game, move_notation_elem);
     }
 
     on_notation_click(e, move_notation, notation_node, chess_game, notation) {
@@ -445,4 +513,21 @@ function create_new_main_move_notation_elem(notation_node) {
 
     move_notation_elem.append(move_notation_text);
     return move_notation_elem;
+}
+
+class OnlineNotation extends Notation {
+    constructor(current_highligted_node = null, notation_view = null, websocket_obj = null) {
+        super(current_highligted_node, notation_view);
+        this.websocket_obj = websocket_obj;
+    }
+
+    write_new_main_line(notation_node, chess_game) {
+        this.websocket_obj.send(JSON.stringify({
+            'type': "new_move",
+            'player_id': 1,
+            'move_notation_uci': notation_node.uci,
+            'color_is_white': notation_node.is_white
+        }));
+        super.write_new_main_line(notation_node, chess_game);
+    }
 }

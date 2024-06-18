@@ -317,6 +317,12 @@ class ChessGame {
             return;
         }
 
+        this.make_move_base_logic(initial_square, move_square, promoted_piece);
+        // notation final update
+        this._save_notation_node_after_move(promoted_piece, initial_square, move_square);
+    }
+
+    make_move_base_logic(initial_square, move_square, promoted_piece = null) {
         const position_before_move = { ...this.current_position };
         // en passant handling
         this._update_if_en_passant(initial_square, move_square);
@@ -362,9 +368,34 @@ class ChessGame {
         this._update_50_moves_counter(is_pawn_move, piece_has_been_eaten);
         this.move_turn_white = !this.move_turn_white;
         this._update_available_moves();
+    }
 
-        // notation final update
-        this._save_notation_node_after_move(promoted_piece);
+    make_move_from_server_to_main_line(initial_square, move_square, promoted_piece = null) {
+        if (!this.available_moves_dict[initial_square].has(move_square)) {
+            return;
+        }
+
+        this.make_move_base_logic(initial_square, move_square, promoted_piece);
+        this.current_notation_node.set_node_suffix(
+            this.current_position,
+            this.is_white_0_0_possible,
+            this.is_white_0_0_0_possible,
+            this.is_black_0_0_possible,
+            this.is_black_0_0_0_possible,
+            this.is_en_passant,
+            this.en_passant_square,
+            this.all_positions_count,
+            this.counter_50_moves_draw,
+            this.initial_notation_node,
+            this.current_notation_node,
+            this.game_is_end,
+            this.is_draw,
+            this.white_won,
+            promoted_piece,
+            initial_square,
+            move_square
+        );
+        this.notation.write_new_main_line_from_server(this.current_notation_node, this, false);
     }
 
     update_board() {
@@ -404,7 +435,7 @@ class ChessGame {
         this.current_notation_node = new_notation_node;
     }
 
-    _save_notation_node_after_move(promoted_piece) {
+    _save_notation_node_after_move(promoted_piece, from_square, to_square) {
         this.current_notation_node.set_node_suffix(
             this.current_position,
             this.is_white_0_0_possible,
@@ -420,7 +451,9 @@ class ChessGame {
             this.game_is_end,
             this.is_draw,
             this.white_won,
-            promoted_piece
+            promoted_piece,
+            from_square,
+            to_square
         );
         this.notation.write_new_node(this.current_notation_node, this);
     }
