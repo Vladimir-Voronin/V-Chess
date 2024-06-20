@@ -451,6 +451,7 @@ class NotationView {
         this.all_move_notation_elements.push(move_notation_branch_element);
         notation_node.notation_element = move_notation_branch_element;
         notation.go_to_notation_node(notation_node, chess_game, move_notation_branch_element);
+        this.scroll_notation_down();
     }
 
     write_new_main_line(notation_node, chess_game, notation, move_to_target = true) {
@@ -459,6 +460,8 @@ class NotationView {
             this.current_row_element = new_row;
             this.notation_element.append(this.current_row_element);
         }
+        const all_rows = document.querySelectorAll(".notation-row");
+        this.current_row_element = all_rows[all_rows.length - 1];
         const move_notation_elem = create_new_main_move_notation_elem(notation_node);
         this.current_row_element.append(move_notation_elem);
         move_notation_elem.addEventListener("click", ((e) => {
@@ -468,6 +471,7 @@ class NotationView {
         notation_node.notation_element = move_notation_elem;
         if (move_to_target)
             notation.go_to_notation_node(notation_node, chess_game, move_notation_elem);
+        this.scroll_notation_down();
     }
 
     on_notation_click(e, move_notation, notation_node, chess_game, notation) {

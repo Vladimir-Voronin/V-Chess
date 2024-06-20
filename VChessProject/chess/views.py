@@ -17,6 +17,7 @@ from django.views.generic import TemplateView, FormView
 
 from . import config
 from .forms import SignUpForm, LoginForm
+from .models import Game
 from .tasks import clear_redis
 from .tasks import add_player_to_search_queue, delete_player_from_search_queue, start_global_search, \
     PlayerSearchTaskRedis
@@ -103,3 +104,8 @@ def ajax_return_new_html_test(request):
 class OnlineGameView(LoginRequiredMixin, TemplateView):
     login_url = reverse_lazy('chess:log-in')
     template_name = "chess/online_game.html"
+
+    def get(self, request, game_id):
+        if not Game.objects.filter(id=game_id).first():
+            return HttpResponseRedirect(self.login_url)
+        return super().get(request, game_id)
