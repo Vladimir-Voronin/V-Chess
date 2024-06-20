@@ -72,4 +72,12 @@ def import_non_local(name, custom_name=None):
     print(sys.path)
     module = importlib.import_module(name, sys.path[-1])
     print(module)
-    return module
+
+
+def change_elo(player_a_rating, player_b_rating, result_of_player_a):
+    """Calculates changing of ELO based on players' rating and result of a game
+
+    result_of_player_a must be in [0, 0.5, 1]"""
+    expected_points = 1 / (1 + 10 ** ((player_b_rating - player_a_rating) / 400))
+    k = 10
+    return k * (result_of_player_a - expected_points)
