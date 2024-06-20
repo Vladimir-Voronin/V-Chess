@@ -73,52 +73,79 @@ const play_button = document.querySelector("#play_button");
 const cancel_button = document.querySelector("#cancel_button");
 
 play_button.addEventListener("click", (e) => {
-    on_play_button_click(e, time_control_view, play_button, cancel_button)
+    on_play_button_click_socket(e, time_control_view, play_button, cancel_button)
 });
 cancel_button.addEventListener("click", (e) => {
-    on_cancel_button_click(e, play_button, cancel_button)
+    on_cancel_button_click_socket(e, play_button, cancel_button)
 });
 
-function on_play_button_click(e, timecontrol_view, play_button, cancel_button) {
+const search_game_socket = new WebSocket(
+    'ws://'
+    + window.location.host
+    + '/ws/search_game/'
+);
+
+search_game_socket.onopen = function (e) {
+    console.log("Search socket has been started");
+}
+
+search_game_socket.onclose = function (e) {
+    console.error('Search socket closed unexpectedly');
+};
+
+let get_searching_game_timeout = null;
+
+function on_play_button_click_socket(e, timecontrol_view, play_button, cancel_button) {
     const active_timecontrol = time_control_view.all_time_controls.find((elem) => elem.is_active);
     console.log(active_timecontrol);
     const data = {
+        "type": "add_new_player_to_queue",
         "full_time": active_timecontrol.full_time,
         "additional_time": active_timecontrol.additional_time,
     };
     console.log(data);
     const data_json = JSON.stringify(data);
     console.log(data_json);
-    $.ajax({
-        data: data_json,
-        type: "GET",
-        url: url_ajax_start_search,
-        contentType: "application/json",
-        dataType: "json",
-        success: function (response) {
-            console.log(response);
-        },
-        error: function (response) {
-            console.log("error");
-        }
-    });
+
+    search_game_socket.send(data_json);
+    const data_searching_game = {
+        "type": "get_game_url_if_exists"
+    }
+    const data_searching_game_json = JSON.stringify(data_searching_game);
+    get_searching_game_timeout = setInterval(() => {
+        search_game_socket.send(data_searching_game_json);
+    }, 1000);
+
     play_button.style.display = "none";
     cancel_button.style.display = "flex";
 }
 
-function on_cancel_button_click(e, play_button, cancel_button) {
-    $.ajax({
-        type: "GET",
-        url: url_ajax_cancel_search,
-        contentType: "application/json",
-        dataType: "json",
-        success: function (response) {
-            console.log(response);
-        },
-        error: function (response) {
-            console.log("error");
-        }
-    });
+function on_cancel_button_click_socket(e, play_button, cancel_button) {
+    const data = {
+        "type": "cancel"
+    };
+    console.log(data);
+    const data_json = JSON.stringify(data);
+    console.log(data_json);
+    clearInterval(get_searching_game_timeout);
+    search_game_socket.send(data_json);
+
     cancel_button.style.display = "none";
     play_button.style.display = "flex";
 }
+
+search_game_socket.onmessage = function (e) {
+    const data = JSON.parse(e.data);
+    console.log(data);
+    switch (data["type"]) {
+        case "game_has_found":
+            clearInterval(get_searching_game_timeout);
+            window.location = "/live/" + data["game_id"];
+            break;
+        case "game_not_found":
+            console.log("Game not found. Searching...");
+            break;
+        default:
+            console.log("There is no such type of websocket message")
+    }
+};

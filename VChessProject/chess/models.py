@@ -52,11 +52,18 @@ class GameResult(models.Model):
 class Game(models.Model):
     chess_user_white = models.ForeignKey(ChessUser, on_delete=models.DO_NOTHING, related_name="chess_user_white")
     chess_user_black = models.ForeignKey(ChessUser, on_delete=models.DO_NOTHING, related_name="chess_user_black")
-    game_result = models.ForeignKey(GameResult, on_delete=models.CASCADE)
+    game_result = models.ForeignKey(GameResult, on_delete=models.CASCADE, null=True)
     game_search_settings = models.ForeignKey(GameSearchSettings, on_delete=models.DO_NOTHING)
     is_active = models.BooleanField(default=False)
-    game_notation = models.TextField(null=True)
     white_rating = models.FloatField(null=True)
     black_rating = models.FloatField(null=True)
-    start_time = models.DateTimeField(null=True)
+    start_time = models.DateTimeField(null=True, auto_now_add=True)
     end_time = models.DateTimeField(null=True)
+    pgn_file = models.TextField(null=True)
+
+
+class MoveUCI(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    move_number = models.IntegerField(null=False, blank=False)
+    is_white = models.BooleanField(null=False, blank=False)
+    uci = models.CharField(max_length=5)

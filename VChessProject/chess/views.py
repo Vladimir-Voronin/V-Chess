@@ -1,20 +1,22 @@
 import json
 import time
-from pathlib import Path
+import logging
+import redis
 
+from pathlib import Path
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView, FormView
 
 from . import config
 from .forms import SignUpForm, LoginForm
-import logging
-
 from .tasks import clear_redis
 from .tasks import add_player_to_search_queue, delete_player_from_search_queue, start_global_search, \
     PlayerSearchTaskRedis
@@ -98,5 +100,6 @@ def ajax_return_new_html_test(request):
     return JsonResponse({"success": True, "new_right_container_html": html})
 
 
-class OnlineGameView(TemplateView):
+class OnlineGameView(LoginRequiredMixin, TemplateView):
+    login_url = reverse_lazy('chess:log-in')
     template_name = "chess/online_game.html"

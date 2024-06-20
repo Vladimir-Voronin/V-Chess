@@ -19,7 +19,7 @@ const notation_view = new NotationView(
 )
 const notation = new Notation(null, notation_view);
 
-chess_board1 = new ChessBoard(chess_board_element, path_to_pieces);
+chess_board1 = new ChessBoard(chess_board_element, path_to_pieces, false, false);
 chess_board1.create_board();
 
 chess_game = new ChessGame(chess_board1);

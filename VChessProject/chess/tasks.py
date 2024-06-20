@@ -1,16 +1,14 @@
-import collections
 import json
 import random
 import time
-from collections import deque
+import redis
 
 from VChessProject.celery import app
 from celery import Task
-from django.core.cache import cache
-import redis
 
 from . import config
-from .maintain import PlayerInSearch, ChessGameMatching, json_chess_game_matching_load, json_player_in_search_load
+from .support_modules.maintain import PlayerInSearch, ChessGameMatching, \
+    json_chess_game_matching_load, json_player_in_search_load
 from VChessProject import settings
 
 
@@ -36,7 +34,9 @@ class PlayerSearchTaskRedis(Task):
         json_game_info = json.dumps(game_info)
         self.redis.hset(config.REDIS_GAME_PAIRS_NAME, player_1_id, json_game_info)
 
-    def redis_delete_from_pairs_both(self, player_id):
+    def redis_delete_from_pairs_because_canceled(self, player_id):
+        """ Delete pair, but return another player back to queue"""
+
         chess_game = self.redis_get_pair_info(player_id)
         if chess_game:
             rival = chess_game.rival_playerinsearch
@@ -170,5 +170,4 @@ def delete_player_from_search_queue(self, player_id):
 
 @app.task(base=PlayerSearchTaskRedis, bind=True)
 def check_if_the_game_has_been_found(self, player_id):
-    result = self.game_is_found(player_id)
-    return result
+    return self.game_is_found(player_id)

@@ -1,5 +1,5 @@
 class ChessBoard {
-    constructor(chess_board_element, path_to_pieces) {
+    constructor(chess_board_element, path_to_pieces, block_white = true, block_black = true) {
         this.chess_board_element = chess_board_element;
         this.path_to_pieces = path_to_pieces;
         this.coord_square_dict = {};
@@ -9,6 +9,8 @@ class ChessBoard {
         this.is_animation = false;
         this.square_from = null;
         this.square_over = null;
+        this.block_white = block_white;
+        this.block_black = block_black;
     }
 
     create_board() {
@@ -75,6 +77,13 @@ class ChessBoard {
         // take the start coordinate of square
         this.square_from = current_choosen_piece.parentNode.parentNode;
         const current_square_id = this.square_from.getAttribute("square-id");
+        const piece_color_is_white = this.chess_game.current_position[current_square_id].is_white
+        
+        // block access if it restricted by color
+        if ((piece_color_is_white && this.block_white) || (!piece_color_is_white && this.block_black)) {
+            return;
+        }
+
         // check if you may lead with this piece
         if (!(check_availability_to_move(current_square_id, this.chess_game)))
             return;

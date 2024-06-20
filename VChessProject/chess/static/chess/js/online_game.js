@@ -86,8 +86,12 @@ test_button.addEventListener("click", () => {
 });
 
 function update_game_from_server(chess_game, all_moves) {
-    console.log("here");
     chess_game.notation.resume_main_line_with_uci_moves(chess_game, all_moves, path_to_pieces);
+}
+
+function change_chess_board_block_access(chess_board, block_white, block_black) {
+    chess_board.block_white = block_white;
+    chess_board.block_black = block_black;
 }
 
 online_game_socket.onmessage = function (e) {
@@ -96,7 +100,19 @@ online_game_socket.onmessage = function (e) {
     switch (data["type"]) {
         case "update_position":
             update_game_from_server(chess_game, data["all_moves"]);
+            const block_white = data["block_white"];
+            const block_black = data["block_black"]
+            change_chess_board_block_access(chess_board, block_white, block_black);
             break;
+        case "flip_board_check":
+            if (data["flip_board"]) {
+                console.log("flip_board")
+                document.querySelector("#flip_board_button").click();
+            }
+            break;
+        case "exception":
+            console.log(`Exception type: ${data["exception_type"]}`);
+            console.log(`Exception message: ${data["exception_message"]}`);
         default:
             console.log("There is no such type of websocket message")
     }

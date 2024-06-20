@@ -325,6 +325,7 @@ class Notation {
             ++i;
             uci_current_move_is_white = !uci_current_move_is_white;
         }
+
         let promoted = null;
         let promoted_piece = null
         for (let index = i; index < all_moves.length; index++) {
@@ -525,6 +526,7 @@ class OnlineNotation extends Notation {
         this.websocket_obj.send(JSON.stringify({
             'type': "new_move",
             'player_id': 1,
+            'move_number': notation_node.move_number,
             'move_notation_uci': notation_node.uci,
             'color_is_white': notation_node.is_white
         }));
