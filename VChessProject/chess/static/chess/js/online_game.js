@@ -85,8 +85,8 @@ test_button.addEventListener("click", () => {
     });
 });
 
-function update_game_from_server(chess_game, all_moves) {
-    chess_game.notation.resume_main_line_with_uci_moves(chess_game, all_moves, path_to_pieces);
+function update_game_from_server(chess_game, all_moves, notation_view) {
+    chess_game.notation.resume_main_line_with_uci_moves(chess_game, all_moves, path_to_pieces, notation_view);
 }
 
 function change_chess_board_block_access(chess_board, block_white, block_black) {
@@ -99,7 +99,7 @@ online_game_socket.onmessage = function (e) {
     console.log(data);
     switch (data["type"]) {
         case "update_position":
-            update_game_from_server(chess_game, data["all_moves"]);
+            update_game_from_server(chess_game, data["all_moves"], notation_view);
             const block_white = data["block_white"];
             const block_black = data["block_black"]
             change_chess_board_block_access(chess_board, block_white, block_black);

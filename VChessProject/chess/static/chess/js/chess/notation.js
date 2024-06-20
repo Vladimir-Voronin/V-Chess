@@ -311,7 +311,7 @@ class Notation {
         this.go_to_notation_node(dummy, chess_game, dummy.notation_element);
     }
 
-    resume_main_line_with_uci_moves(chess_game, all_moves, path_to_pieces) {
+    resume_main_line_with_uci_moves(chess_game, all_moves, path_to_pieces, notation_view) {
         let dummy = chess_game.current_notation_node;
 
         while (dummy.parent !== null) {
@@ -323,21 +323,23 @@ class Notation {
         while (dummy.children.length > 0 && dummy.children[0] !== null) {
             dummy = dummy.children[0];
             if (dummy.uci != all_moves[i]) {
+                const notation_to_delete_from = dummy;
+                notation_view.delete_moves_from(dummy.move_number, dummy.is_white);
                 console.log(`Sync Error. move of client ${dummy.uci} is not equal to server move ${all_moves[i]}`)
-                return;
+                dummy = dummy.parent;
+                break;
             }
             ++i;
             uci_current_move_is_white = !uci_current_move_is_white;
         }
-
+        dummy.children = [];
         let promoted = null;
         let promoted_piece = null
+        chess_game.resume_game_from_notation_node(dummy);
         for (let index = i; index < all_moves.length; index++) {
             const uci_move = all_moves[index];
             const from_square = uci_move.slice(0, 2);
             const to_square = uci_move.slice(2, 4);
-            console.log(`from: ${from_square}`);
-            console.log(`to: ${to_square}`);
 
             const classes_dict = {
                 "q": new Queen(null, null).return_basic_piece(path_to_pieces, uci_current_move_is_white),
@@ -407,6 +409,7 @@ class NotationView {
         this.all_move_notation_elements.push(move_notation_branch_element);
         notation_node.notation_element = move_notation_branch_element;
         notation.go_to_notation_node(notation_node, chess_game, move_notation_branch_element);
+        this.scroll_notation_down();
     }
 
     write_new_branch_line(notation_node, chess_game, notation) {
@@ -485,6 +488,30 @@ class NotationView {
             elem.classList.remove("active");
         })
         move_notation.classList.add("active");
+    }
+
+    delete_moves_from(move_number, is_white) {
+        const move_to_delete = document.querySelector(`div.move-notation[move_number='${move_number}'][is_white='${is_white}']`)
+        const parent_row = move_to_delete.parentElement;
+        let sib = parent_row.nextSibling;
+        if (is_white) {
+            parent_row.remove();
+        }
+        else {
+            move_to_delete.remove();
+        }
+        
+        while (sib) {
+            let save = sib.nextSibling;
+            sib.remove();
+            console.log(sib);
+            sib = save;
+        }
+    }
+
+    scroll_notation_down() {
+        var div = $(".right-menu-content");
+        div.scrollTop(div.prop('scrollHeight'));
     }
 }
 
