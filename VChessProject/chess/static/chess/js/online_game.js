@@ -16,13 +16,13 @@ const players_bind = new RightMenuBind(
 const right_menu_view = new RightMenuView([notation_bind, play_bind, players_bind]);
 const notation_view = new NotationView(
     document.querySelector("#notation_body")
-)
-const notation = new Notation(null, notation_view);
+);
+const notation = new OnlineNotation(null, notation_view, online_game_socket);
 
-chess_board1 = new ChessBoard(chess_board_element, path_to_pieces, false, false);
-chess_board1.create_board();
+chess_board = new ChessBoard(chess_board_element, path_to_pieces);
+chess_board.create_board();
 
-chess_game = new ChessGame(chess_board1);
+chess_game = new ChessGame(chess_board);
 chess_game.notation = notation;
 
 chess_game.set_figure_start_position(start_position,
@@ -84,3 +84,36 @@ test_button.addEventListener("click", () => {
         }
     });
 });
+
+function update_game_from_server(chess_game, all_moves, notation_view) {
+    chess_game.notation.resume_main_line_with_uci_moves(chess_game, all_moves, path_to_pieces, notation_view);
+}
+
+function change_chess_board_block_access(chess_board, block_white, block_black) {
+    chess_board.block_white = block_white;
+    chess_board.block_black = block_black;
+}
+
+online_game_socket.onmessage = function (e) {
+    const data = JSON.parse(e.data);
+    console.log(data);
+    switch (data["type"]) {
+        case "update_position":
+            update_game_from_server(chess_game, data["all_moves"], notation_view);
+            const block_white = data["block_white"];
+            const block_black = data["block_black"]
+            change_chess_board_block_access(chess_board, block_white, block_black);
+            break;
+        case "flip_board_check":
+            if (data["flip_board"]) {
+                console.log("flip_board")
+                document.querySelector("#flip_board_button").click();
+            }
+            break;
+        case "exception":
+            console.log(`Exception type: ${data["exception_type"]}`);
+            console.log(`Exception message: ${data["exception_message"]}`);
+        default:
+            console.log("There is no such type of websocket message")
+    }
+};

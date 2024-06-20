@@ -9,6 +9,12 @@ class ChessPiece {
 }
 
 class Pawn extends ChessPiece {
+    return_basic_piece(path_to_piece_folder, is_white) {
+        const file_name = is_white ? "pawn-w.svg" : "pawn-b.svg"
+        const element = `<div class="piece-wrapper"><img class="piece-size" src="${path_to_piece_folder}/${file_name}"></img></div>`;
+        return new Pawn(element, is_white);
+    }
+
     get_available_moves(piece_square, current_position) {
         const available_leads = new Set();
         // because pawn can move only one direction (up for white, down for black)
@@ -34,9 +40,26 @@ class Pawn extends ChessPiece {
         }
         return available_leads;
     }
+
+    get_en_passant_move(piece_square, potential_en_passant) {
+        const sign = this.is_white ? 1 : -1;
+        const diag_1_1 = get_square_coord_shift(piece_square, 1, sign);
+        const diag_m1_1 = get_square_coord_shift(piece_square, -1, sign);
+        if (potential_en_passant === diag_1_1 ||
+            potential_en_passant === diag_m1_1
+        ) {
+            return potential_en_passant;
+        }
+    }
 }
 
 class Knight extends ChessPiece {
+    return_basic_piece(path_to_piece_folder, is_white) {
+        const file_name = is_white ? "knight-w.svg" : "knight-b.svg"
+        const element = `<div class="piece-wrapper"><img class="piece-size" src="${path_to_piece_folder}/${file_name}"></img></div>`;
+        return new Knight(element, is_white);
+    }
+
     get_available_moves(chess_square, current_position) {
         const available_leads = new Set();
         const shift_combinations = [[2, 1],
@@ -50,7 +73,8 @@ class Knight extends ChessPiece {
         ]
         shift_combinations.forEach(shift => {
             const potential_square = get_square_coord_shift(chess_square, shift[0], shift[1]);
-            if (!(potential_square in current_position) || current_position[potential_square].is_white !== this.is_white) {
+            if (potential_square &&
+                (!(potential_square in current_position) || current_position[potential_square].is_white !== this.is_white)) {
                 available_leads.add(potential_square);
             }
         })
@@ -59,6 +83,12 @@ class Knight extends ChessPiece {
 }
 
 class Bishop extends ChessPiece {
+    return_basic_piece(path_to_piece_folder, is_white) {
+        const file_name = is_white ? "bishop-w.svg" : "bishop-b.svg"
+        const element = `<div class="piece-wrapper"><img class="piece-size" src="${path_to_piece_folder}/${file_name}"></img></div>`;
+        return new Bishop(element, is_white);
+    }
+
     get_available_moves(chess_square, current_position) {
         const available_leads = new Set();
         const axes = [[1, 1],
@@ -92,6 +122,12 @@ class Bishop extends ChessPiece {
 }
 
 class Rook extends ChessPiece {
+    return_basic_piece(path_to_piece_folder, is_white) {
+        const file_name = is_white ? "rook-w.svg" : "rook-b.svg"
+        const element = `<div class="piece-wrapper"><img class="piece-size" src="${path_to_piece_folder}/${file_name}"></img></div>`;
+        return new Rook(element, is_white);
+    }
+
     get_available_moves(chess_square, current_position) {
         const available_leads = new Set();
         const axes = [[1, 0],
@@ -125,6 +161,12 @@ class Rook extends ChessPiece {
 }
 
 class Queen extends ChessPiece {
+    return_basic_piece(path_to_piece_folder, is_white) {
+        const file_name = is_white ? "queen-w.svg" : "queen-b.svg"
+        const element = `<div class="piece-wrapper"><img class="piece-size" src="${path_to_piece_folder}/${file_name}"></img></div>`;
+        return new Queen(element, is_white);
+    }
+
     get_available_moves(chess_square, current_position) {
         const available_leads = new Set();
         let axes = [[1, 0],
@@ -184,6 +226,12 @@ class Queen extends ChessPiece {
 }
 
 class King extends ChessPiece {
+    return_basic_piece(path_to_piece_folder, is_white) {
+        const file_name = is_white ? "king-w.svg" : "king-b.svg"
+        const element = `<div class="piece-wrapper"><img class="piece-size" src="${path_to_piece_folder}/${file_name}"></img></div>`;
+        return new King(element, is_white);
+    }
+
     get_available_moves(chess_square, current_position) {
         const available_leads = new Set();
         const axes = [[1, 1],

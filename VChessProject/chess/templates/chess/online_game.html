@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-  Board Analysis
+  Online game
 {% endblock %}
 
 {% block stylesheets %}
@@ -21,7 +21,7 @@
           <img src="{% static 'chess/img/icons/no_avatar.png' %}" class="png-icon" />
         </div>
         <div class="user-data">
-          <a>Black</a>
+          <a>Online Black</a>
         </div>
         <div class="timer-black">3:00</div>
       </div>
@@ -39,7 +39,7 @@
           <img src="{% static 'chess/img/icons/no_avatar.png' %}" class="png-icon" />
         </div>
         <div class="user-data">
-          <a>White</a>
+          <a>Online White</a>
         </div>
         <div class="timer-white">3:00</div>
       </div>
@@ -79,14 +79,7 @@
               <div class="time-control-button" id="timecontrol_15">15 min</div>
             </div>
             <div class="play-body-row">
-              <button class="big-button" id="play_button">Play</button>
-              <button class="big-button" id="cancel_button">Cancel search</button>
-            </div>
-            <div class="play-body-row">
               <button class="big-button" id="test_button">Test</button>
-            </div>
-            <div class="play-body-row">
-              <button class="big-button" id="test_button"><a href="{% url 'chess:online_game' game_id='1' %}">Test 2</a></button>
             </div>
           </div>
         </div>
@@ -113,13 +106,8 @@
   </div>
 
   {% include 'chess/parts/import_pieces_js.html' %}
-  <script>
-    url_ajax_start_search = "{% url 'chess:ajax_start_search' %}"
-    url_ajax_cancel_search = "{% url 'chess:ajax_cancel_search' %}"
-    url_ajax_return_new_html_test = "{% url 'chess:ajax_return_new_html_test' %}"
-    basic_url = "{% url 'chess:home_page' %}"
-  </script>
-  <script src="{% static 'chess/js/chess/right_menu/play.js' %}" defer></script>
+
+  <script src="{% static 'chess/js/chess/online_game_websocket.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/pieces.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/pgn.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/right_menu.js' %}" defer></script>
@@ -128,5 +116,5 @@
   <script src="{% static 'chess/js/chess/chess_game_functions.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/chess_game.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/positions.js' %}" defer></script>
-  <script src="{% static 'chess/js/board.js' %}" defer></script>
+  <script src="{% static 'chess/js/online_game.js' %}" defer></script>
 {% endblock %}

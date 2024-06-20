@@ -1,13 +1,28 @@
-from pathlib import Path
+import json
+import time
+import logging
+import redis
 
+from pathlib import Path
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
-from django.urls import reverse
+from django.template.loader import render_to_string
+from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView, FormView
 
+from . import config
 from .forms import SignUpForm, LoginForm
+from .models import Game
+from .tasks import clear_redis
+from .tasks import add_player_to_search_queue, delete_player_from_search_queue, start_global_search, \
+    PlayerSearchTaskRedis
+
+logger = logging.getLogger(__name__)
 
 
 def base_page(request):
@@ -37,6 +52,7 @@ class LogInView(FormView):
     template_name = Path("chess/log_in.html")
 
     def get_success_url(self):
+        logger.info("You successfully logged in")
         return reverse('chess:home_page')
 
     def form_valid(self, form):
@@ -58,3 +74,38 @@ def logout_view(request):
 class BoardView(TemplateView):
     template_name = Path("chess/board.html")
 
+
+def ajax_start_search(request):
+    # clear_redis()
+    logger.info("Start search")
+    start_global_search.delay()
+    data = json.loads(tuple(request.GET)[0])
+    user = User.objects.get(username=request.user)
+    r = add_player_to_search_queue.delay(user.id, data["full_time"], data["additional_time"], 1200)
+    return JsonResponse({"How": "Long"})
+
+
+def ajax_cancel_search(request):
+    logger.info("Cancel search")
+    user = User.objects.get(username=request.user)
+    delete_player_from_search_queue.delay(user.id)
+    return JsonResponse({"Cancel": "Search"})
+
+
+def ajax_get_match_if_found(request):
+    logger.info("Getting match")
+
+
+def ajax_return_new_html_test(request):
+    html = render_to_string("chess/online_game.html")
+    return JsonResponse({"success": True, "new_right_container_html": html})
+
+
+class OnlineGameView(LoginRequiredMixin, TemplateView):
+    login_url = reverse_lazy('chess:log-in')
+    template_name = "chess/online_game.html"
+
+    def get(self, request, game_id):
+        if not Game.objects.filter(id=game_id).first():
+            return HttpResponseRedirect(self.login_url)
+        return super().get(request, game_id)
