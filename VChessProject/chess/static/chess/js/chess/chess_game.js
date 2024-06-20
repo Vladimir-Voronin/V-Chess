@@ -78,7 +78,7 @@ class ChessBoard {
         this.square_from = current_choosen_piece.parentNode.parentNode;
         const current_square_id = this.square_from.getAttribute("square-id");
         const piece_color_is_white = this.chess_game.current_position[current_square_id].is_white
-        
+
         // block access if it restricted by color
         if ((piece_color_is_white && this.block_white) || (!piece_color_is_white && this.block_black)) {
             return;
@@ -89,7 +89,7 @@ class ChessBoard {
             return;
 
         addSquareShadow(this.square_from);
-        this.from_coord = current_square_id
+        this.from_coord = current_square_id;
 
         showAvailableMovesHints(current_square_id, this.chess_game);
 
@@ -118,7 +118,11 @@ class ChessBoard {
                 self.to_coord = getSquareCoordinates(self.square_over);
 
             if (self.to_coord) {
-                self.chess_game.make_move(self.from_coord, self.to_coord);
+                if (self.chess_game.can_make_move(self.from_coord, self.to_coord)) {
+                    self.chess_game.make_move(self.from_coord, self.to_coord);
+                    if (!self.chess_game.is_trying_to_promote(self.from_coord, self.to_coord))
+                        self.change_last_move_view(self.from_coord, self.to_coord);
+                }
             }
             removeSquareShadow(self.square_from);
             removeSquareShadow(self.square_over);
@@ -136,6 +140,16 @@ class ChessBoard {
         piece_dummy.ondragstart = function () {
             return false;
         };
+    }
+
+    change_last_move_view(from_square, to_square) {
+        for (const [square_id, square] of Object.entries(this.coord_square_dict)) {
+            square.classList.remove("last-move");
+        }
+        if (from_square && to_square) {
+            this.coord_square_dict[from_square].classList.add("last-move");
+            this.coord_square_dict[to_square].classList.add("last-move");
+        }
     }
 
     squareMouseOver(e) {
@@ -241,8 +255,12 @@ class ChessBoard {
             "Bishop": new Bishop(null, null).return_basic_piece(this.path_to_pieces, is_white),
         }
         const promoted = classes_dict[piece_type];
-        this.chess_game.make_move(initial_square, move_square,
-            promoted);
+        if (this.chess_game.can_make_move(initial_square, move_square)) {
+            this.chess_game.make_move(initial_square, move_square,
+                promoted);
+            this.change_last_move_view(initial_square, move_square);
+        }
+
         this._remove_promote_buttons();
     }
 }
@@ -303,7 +321,15 @@ class ChessGame {
         this.move_turn_white = white_to_move;
         this._update_available_moves();
         this.update_board();
+        this.update_last_move();
         this._update_empty_notation();
+    }
+
+    update_last_move() {
+        this.chess_board.change_last_move_view(
+            this.current_notation_node.from_square,
+            this.current_notation_node.to_square
+        )
     }
 
     _update_empty_notation() {
@@ -321,8 +347,12 @@ class ChessGame {
         this.current_notation_node.all_positions_count = { ...this.all_positions_count };
     }
 
+    can_make_move(initial_square, move_square) {
+        return this.available_moves_dict[initial_square].has(move_square);
+    }
+
     make_move(initial_square, move_square, promoted_piece = null) {
-        if (!this.available_moves_dict[initial_square].has(move_square)) {
+        if (!this.can_make_move(initial_square, move_square)) {
             return;
         }
 
@@ -339,7 +369,7 @@ class ChessGame {
         const is_pawn_move = this.current_position[initial_square].constructor.name === "Pawn";
         const number_of_pieces_on_board = Object.keys(this.current_position).length;
         // Promotion
-        if (this._is_trying_to_promote(initial_square, move_square)) {
+        if (this.is_trying_to_promote(initial_square, move_square)) {
             if (promoted_piece) {
                 this.current_position = this._make_new_position(initial_square, move_square);
                 this.current_position[move_square] = promoted_piece;
@@ -467,7 +497,7 @@ class ChessGame {
         this.notation.write_new_node(this.current_notation_node, this);
     }
 
-    _is_trying_to_promote(initial_square, move_square) {
+    is_trying_to_promote(initial_square, move_square) {
         const target_square_check_suffix = this.move_turn_white ? "8" : "1";
         if (this.current_position[initial_square] instanceof Pawn &&
             move_square[1] === target_square_check_suffix

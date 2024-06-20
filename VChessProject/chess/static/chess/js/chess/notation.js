@@ -18,6 +18,8 @@ class NotationNodeTree {
         this.initial_notation_node = null;
         this.current_notation_node = null;
         this.notation_element = null
+        this.from_square = null;
+        this.to_square = null;
     }
 
     set_node_prefix(initial_square,
@@ -126,8 +128,10 @@ class NotationNodeTree {
         this.initial_notation_node = initial_notation_node;
         this.current_notation_node = current_notation_node;
         this.game_is_end = game_is_end;
-        this.is_draw = is_draw,
-            this.white_won = white_won;
+        this.is_draw = is_draw;
+        this.white_won = white_won;
+        this.from_square = from_square;
+        this.to_square = to_square;
         this.uci = from_square + to_square
 
         if (promoted_piece) {

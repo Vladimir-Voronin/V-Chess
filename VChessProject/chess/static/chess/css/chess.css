@@ -112,6 +112,14 @@
     background-color: white;
 }
 
+.chess-square.light-square.last-move {
+    background-color: #F5F682;
+}
+
+.chess-square.dark-square.last-move {
+    background-color: #B9CA43;
+}
+
 .dark-square-shadow {
     box-shadow: 0px 0px 0px 4px var(--chess_board-dark_squares_shadow) inset;
 }
