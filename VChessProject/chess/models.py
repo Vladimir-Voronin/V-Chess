@@ -19,9 +19,6 @@ class FideTitle(models.Model):
 class ChessUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     fide_title = models.ForeignKey(FideTitle, on_delete=models.DO_NOTHING, null=True)
-    blitz_rating = models.FloatField(null=True)
-    rapid_rating = models.FloatField(null=True)
-    classic_rating = models.FloatField(null=True)
 
 
 @receiver(post_save, sender=User)
@@ -33,10 +30,25 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.chessuser.save()
+    game_types = GameType.objects.all()
+    for game_type in game_types:
+        r = Rating(chess_user=instance.chessuser, game_type=game_type, degree_of_confidence=100)
+        r.save()
 
 
 class GameType(models.Model):
     name = models.CharField(max_length=40, primary_key=True)
+
+
+class Rating(models.Model):
+    chess_user = models.ForeignKey(ChessUser, on_delete=models.CASCADE)
+    game_type = models.ForeignKey(GameType, on_delete=models.CASCADE)
+    rating = models.FloatField(default=1200, null=True)
+    last_update = models.DateTimeField(null=True, auto_now=True)
+    degree_of_confidence = models.FloatField(default=100, null=False)
+
+    class Meta:
+        unique_together = ('chess_user', 'game_type',)
 
 
 class GameSearchSettings(models.Model):
