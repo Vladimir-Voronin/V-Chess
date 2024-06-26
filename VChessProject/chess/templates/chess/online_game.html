@@ -23,7 +23,7 @@
         <div class="user-data">
           <a>Online Black</a>
         </div>
-        <div class="timer-black">3:00</div>
+        <div class="timer-black" id="timer_black">10:00</div>
       </div>
     </div>
 
@@ -41,7 +41,7 @@
         <div class="user-data">
           <a>Online White</a>
         </div>
-        <div class="timer-white">3:00</div>
+        <div class="timer-white" id="timer_white">10:00</div>
       </div>
     </div>
   </div>
@@ -106,7 +106,10 @@
   </div>
 
   {% include 'chess/parts/import_pieces_js.html' %}
-
+  <script>
+    const full_time = Number('{{full_time}}');
+    const additional_time_per_move = Number('{{additional_time_per_move}}');
+  </script>
   <script src="{% static 'chess/js/chess/online_game_websocket.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/pieces.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/pgn.js' %}" defer></script>

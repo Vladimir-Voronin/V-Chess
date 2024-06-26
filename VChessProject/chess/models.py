@@ -77,5 +77,11 @@ class Game(models.Model):
 class MoveUCI(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     move_number = models.IntegerField(null=False, blank=False)
+    last_update = models.DateTimeField(null=True)
+    time_on_clock = models.FloatField(null=True)
     is_white = models.BooleanField(null=False, blank=False)
     uci = models.CharField(max_length=5)
+
+    def __str__(self):
+        return f"MoveUCI move_number={self.move_number}, is_white={self.is_white}, uci={self.uci}, " \
+               f"clock={self.time_on_clock}, update_time={self.last_update}"

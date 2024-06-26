@@ -3,8 +3,12 @@ import json
 import logging
 import sys
 import importlib.util
+import time
+
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+from django.utils import timezone
+
 from .models import Game, MoveUCI, ChessUser, GameSearchSettings, Rating, GameResult
 from .support_modules.json_func import json_exception
 from .support_modules.maintain import import_non_local, RedisClient, change_elo
@@ -17,22 +21,6 @@ chess_lib = SourceFileLoader("chess", r'D:\PyProjects\V-Chess\env\lib\site-packa
 import chess.pgn
 
 logger = logging.getLogger(__name__)
-
-
-def game_imitation(board):
-    board.push_san("e4")
-    board.push_san("d5")
-    board.push_san("exd5")
-    board.push_san("e5")
-    board.push_san("dxe6")
-    board.push_san("a6")
-    board.push_san("exf7")
-    board.push_san("Ke7")
-    board.push_san("fxg8=N")
-    print(board.move_stack)
-
-
-game_imitation(chess_lib.Board())
 
 
 def get_all_moves_uci(board):
@@ -51,6 +39,7 @@ class OnlineGameConsumer(AsyncWebsocketConsumer):
 
         # 1. getting game from db
         self.current_game = await self.get_current_game()
+        self.game_search_settings = await self.get_game_search_settings()
         # 2. getting id of player_white and player_black
         self.player_white = await self.get_white_player()
         self.player_black = await self.get_black_player()
@@ -75,16 +64,17 @@ class OnlineGameConsumer(AsyncWebsocketConsumer):
 
     # Receive message from WebSocket
     async def receive(self, text_data):
+        current_time = timezone.now()
         text_data_json = json.loads(text_data)
         message_type = text_data_json["type"]
 
         match message_type:
             case "new_move":
-                await self.new_move(text_data_json)
+                await self.new_move(text_data_json, current_time)
             case _:
                 raise Exception(f"This message type ({message_type}) is not existing")
 
-    async def new_move(self, json_data):
+    async def new_move(self, json_data, current_time):
         if self.chess_user.id != self.player_white.id and self.chess_user.id != self.player_black.id:
             await self.send(
                 json_exception("id_not_matching", "Id of player that made a move is not matching game players id"))
@@ -105,7 +95,17 @@ class OnlineGameConsumer(AsyncWebsocketConsumer):
                 return
 
         logger.info(f"NEW MOVE: move_number={move_number}, is_white={is_white}, uci={move_notation_uci}")
-        new_move = await self.create_new_move(move_number, is_white, move_notation_uci)
+        time_on_clock = self.game_search_settings.full_time
+        if move_number > 1:
+            last_move_with_same_color = await self.get_last_move_with_color(is_white)
+            last_move_in_game = await self.get_last_move_in_game()
+            logger.info(f"last_move_in_game == {last_move_in_game}")
+            time_difference = current_time - last_move_in_game.last_update
+            time_difference_in_seconds = time_difference.total_seconds()
+            time_on_clock = last_move_with_same_color.time_on_clock - time_difference_in_seconds
+            time_on_clock += self.game_search_settings.time_per_move
+
+        new_move = await self.create_new_move(move_number, is_white, move_notation_uci, time_on_clock, current_time)
         await self.update_position_room()
 
     async def update_position_from_db(self):
@@ -113,9 +113,19 @@ class OnlineGameConsumer(AsyncWebsocketConsumer):
         all_moves_obj = await self.get_all_moves_of_game(self.current_game)
         all_moves_uci = [move.uci for move in all_moves_obj]
         current_moves = self.board.move_stack
+
+        move_number = len(current_moves) // 2
         for i in range(len(current_moves), len(all_moves_uci)):
             self.board.push_uci(all_moves_uci[i])
 
+        last_move_white = await self.get_last_move_with_color(True)
+        last_move_black = await self.get_last_move_with_color(False)
+        if not last_move_white or not last_move_black:
+            move_number = 1
+            is_last_move_white = True if last_move_white else False
+        else:
+            move_number = max(last_move_white.move_number, last_move_black.move_number)
+            is_last_move_white = True if last_move_white.move_number > last_move_black.move_number else False
         game_has_ended = False
         is_white_won = None
         is_draw = False
@@ -152,12 +162,40 @@ class OnlineGameConsumer(AsyncWebsocketConsumer):
                 new_black_rating = new_black_rating.rating
                 await self.update_game_result(False, is_draw, is_white_won)
 
+        time_white_left = self.game_search_settings.full_time
+        time_black_left = self.game_search_settings.full_time
+        if last_move_white and last_move_black:
+            if move_number > 1:
+                time_black_left = last_move_black.time_on_clock
+                time_white_left = last_move_white.time_on_clock
+
+        last_move_datetime = None
+        if is_last_move_white:
+            if last_move_white:
+                logger.info(f"last move white update time == {last_move_white.last_update}")
+                logger.info(f"last move white update time == {last_move_white.last_update.timestamp() * 1000}")
+                last_move_datetime = int(last_move_white.last_update.timestamp() * 1000)
+        else:
+            if last_move_black:
+                logger.info(f"last move black update time == {last_move_black.last_update}")
+                logger.info(f"last move black update time == {last_move_black.last_update.timestamp() * 1000}")
+                last_move_datetime = int(last_move_black.last_update.timestamp() * 1000)
+
+        logger.info(f"last move was white == {is_last_move_white}")
+        logger.info(f"last move datetime == {last_move_datetime}")
+
         # 4. send json with all this info and change position on client side
         update_position_data = {
             "type": "update_position",
             "all_moves": all_moves_uci,
             "block_white": self.block_white,
             "block_black": self.block_black,
+            "full_time_seconds": self.game_search_settings.full_time,
+            "additional_time_seconds": self.game_search_settings.time_per_move,
+            "is_last_move_white": is_last_move_white,
+            "time_white_left": time_white_left,
+            "time_black_left": time_black_left,
+            "last_move_datetime": last_move_datetime,
             "game_has_ended": game_has_ended,
             "is_draw": is_draw,
             "is_white_won": is_white_won,
@@ -166,7 +204,6 @@ class OnlineGameConsumer(AsyncWebsocketConsumer):
             "new_white_rating": new_white_rating,
             "new_black_rating": new_black_rating
         }
-
         return update_position_data
 
     async def update_position_client(self):
@@ -199,6 +236,10 @@ class OnlineGameConsumer(AsyncWebsocketConsumer):
         return Game.objects.get(id=self.game_id)
 
     @database_sync_to_async
+    def get_game_search_settings(self):
+        return self.current_game.game_search_settings
+
+    @database_sync_to_async
     def get_white_player(self):
         return ChessUser.objects.get(id=self.current_game.chess_user_white_id)
 
@@ -215,9 +256,11 @@ class OnlineGameConsumer(AsyncWebsocketConsumer):
         return list(MoveUCI.objects.filter(game=game).order_by("move_number", "-is_white"))
 
     @database_sync_to_async
-    def create_new_move(self, move_number, is_white, uci):
-        new_move = MoveUCI(game=self.current_game, move_number=move_number, is_white=is_white, uci=uci)
+    def create_new_move(self, move_number, is_white, uci, time_on_clock, current_time):
+        new_move = MoveUCI(game=self.current_game, move_number=move_number, is_white=is_white, uci=uci,
+                           time_on_clock=time_on_clock, last_update=current_time)
         new_move.save()
+        logger.info(f"New move was created: {new_move}")
         return new_move
 
     @database_sync_to_async
@@ -251,6 +294,16 @@ class OnlineGameConsumer(AsyncWebsocketConsumer):
         self.current_game.game_result = game_result
         self.current_game.save()
 
+    @database_sync_to_async
+    def get_last_move_with_color(self, is_white):
+        moves = list(MoveUCI.objects.filter(game=self.current_game, is_white=is_white).order_by("-move_number"))
+        return moves[0] if moves else None
+
+    @database_sync_to_async
+    def get_last_move_in_game(self):
+        moves = list(MoveUCI.objects.filter(game=self.current_game).order_by("-last_update"))
+        return moves[0] if moves else None
+
 
 class SearchGameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -274,7 +327,6 @@ class SearchGameConsumer(AsyncWebsocketConsumer):
 
     async def add_new_player_to_queue(self, text_data_json):
         start_global_search.delay()
-        print(self.chess_user.id)
         add_player_to_search_queue.delay(self.chess_user.id, text_data_json["full_time"],
                                          text_data_json["additional_time"],
                                          1200)
@@ -284,13 +336,14 @@ class SearchGameConsumer(AsyncWebsocketConsumer):
         delete_player_from_search_queue.delay(self.chess_user.id)
 
     async def get_game_url_if_exists(self, text_data_json):
-        print("get game")
         active_game = await self.get_active_game()
+        redis = RedisClient()
         if active_game:
             await self.game_is_found(active_game.id)
+            redis.redis_delete_from_pairs_both(self.chess_user.id)
         else:
-            redis = RedisClient()
             game = redis.redis_get_pair_info(self.chess_user.id)
+
             if not game:
                 error_data = {
                     "type": "game_not_found"
@@ -298,7 +351,7 @@ class SearchGameConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=json.dumps(error_data))
                 return
             rival = game.rival_playerinsearch
-
+            redis.redis_delete_from_pairs_both(self.chess_user.id)
             game_settings = await self.get_game_settings(rival.full_time_timer, rival.additional_time_timer)
             rival_chess_user = await self.get_chess_player_by_id(rival.id)
             white_user, black_user = (self.chess_user, rival_chess_user) if game.is_white else (

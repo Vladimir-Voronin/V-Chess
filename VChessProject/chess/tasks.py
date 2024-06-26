@@ -2,6 +2,7 @@ import json
 import random
 import time
 import redis
+import pdb
 
 from VChessProject.celery import app
 from celery import Task
@@ -31,6 +32,7 @@ class PlayerSearchTaskRedis(Task):
         self.redis.sadd(config.REDIS_PLAYER_IN_SEARCH_SET_NAME, player_id)
 
     def redis_save_to_pairs(self, player_1_id, game_info):
+        print("Saving")
         json_game_info = json.dumps(game_info)
         self.redis.hset(config.REDIS_GAME_PAIRS_NAME, player_1_id, json_game_info)
 
@@ -81,6 +83,7 @@ class PlayerSearchTaskRedis(Task):
         time.sleep(1)
         i = 0
         while True:
+            print("NEW ITERATION")
             time.sleep(3)
             i += 1
             self.print_debug_info()
@@ -88,10 +91,12 @@ class PlayerSearchTaskRedis(Task):
                 time.sleep(self.sleep_between_iterations)
                 print("too few players")
                 continue
-
+            print(1)
             potential_player = self.redis_popleft_queue()
+            print(f"Potential player {potential_player}")
             if not self.redis_is_player_in_set(potential_player.id):
                 continue
+            print(2)
             rival = None
             for player_data in self.redis.lrange(config.REDIS_PLAYER_SEARCH_QUEUE_NAME, 0, -1):
                 player = json_player_in_search_load(player_data)
@@ -101,10 +106,13 @@ class PlayerSearchTaskRedis(Task):
                     rival = player
                     break
 
+            if rival.id == potential_player.id:
+                continue
             if not rival:
                 self.redis_add_to_queue(potential_player)
                 continue
 
+            print(3)
             self.make_pair(potential_player, rival)
 
     def print_debug_info(self):
@@ -118,12 +126,15 @@ class PlayerSearchTaskRedis(Task):
         return True
 
     def make_pair(self, player_1, player_2):
+        print(f"Trying to make pair between {player_1} and {player_2}")
         assert player_1.id != player_2.id
         self.redis_delete_player_in_set(player_1.id)
         self.redis_delete_player_in_set(player_2.id)
         player_1_is_white = True if random.randint(0, 1) else False
         game_info_1 = ChessGameMatching(player_2, not player_1_is_white)
         game_info_2 = ChessGameMatching(player_1, player_1_is_white)
+        print(game_info_1)
+        print(game_info_2)
         self.redis_save_to_pairs(player_1.id, game_info_1)
         self.redis_save_to_pairs(player_2.id, game_info_2)
         assert not self.redis_is_player_in_set(player_1.id)
@@ -131,6 +142,7 @@ class PlayerSearchTaskRedis(Task):
 
     def add_player(self, player_id, full_time_timer, additional_time_timer, player_rating):
         self.print_debug_info()
+        print("HELLO")
         player = PlayerInSearch(player_id, full_time_timer, additional_time_timer, player_rating)
         print(f"ADDING player = {player_id}")
         if not self.redis_is_player_in_set(player.id) and not self.redis_is_player_in_pairs(player_id):
@@ -140,7 +152,7 @@ class PlayerSearchTaskRedis(Task):
 
     def delete_player(self, player_id):
         self.redis_delete_player_in_set(player_id)
-        self.redis_delete_from_pairs_both(player_id)
+        self.redis_delete_from_pairs_because_canceled(player_id)
         print(f"Player {player_id} was deleted")
 
     def game_is_found(self, player_id):
@@ -160,6 +172,7 @@ def start_global_search(self):
 
 @app.task(base=PlayerSearchTaskRedis, bind=True)
 def add_player_to_search_queue(self, player_id, full_time_timer, additional_time_timer, player_rating):
+    print("HERE")
     self.add_player(player_id, full_time_timer, additional_time_timer, player_rating)
 
 

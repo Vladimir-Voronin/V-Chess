@@ -266,7 +266,7 @@ class ChessBoard {
 }
 
 class ChessGame {
-    constructor(chess_board) {
+    constructor(chess_board, timer_white = null, timer_black = null) {
         this.chess_board = chess_board;
         this.chess_board.chess_game = this;
         this.current_position = null;
@@ -286,6 +286,8 @@ class ChessGame {
         this.initial_notation_node = null;
         this.current_notation_node = null;
         this.notation = null;
+        this.timer_white = timer_white;
+        this.timer_black = timer_black;
     }
 
     set_figure_start_position(position,
@@ -600,6 +602,30 @@ class ChessGame {
         }
     }
 
+    set_timers_start() {
+        if (!this.timer_white || !this.timer_black)
+            return;
+        this.timer_white.set_time_start();
+        this.timer_black.set_time_start();
+    }
+    switch_timer_to_white() {
+        if (!this.timer_white || !this.timer_black)
+            return;
+
+        console.log("Switch timer to white")
+        this.timer_black.pause();
+        this.timer_white.unpause()
+    }
+
+    switch_timer_to_black() {
+        if (!this.timer_white || !this.timer_black)
+            return;
+
+        console.log("Switch timer to white")
+        this.timer_white.pause();
+        this.timer_black.unpause()
+    }
+
     _set_game_end(is_draw, white_won) {
         this.game_is_end = true;
         this.is_draw = is_draw;
@@ -798,5 +824,175 @@ function flip_board(chess_board, top_user_bar_element, bottom_user_bar_element) 
     }
     else {
         chess_board.chess_board_element.classList.add("flip-chessboard");
+    }
+}
+
+function get_timer_representation(seconds) {
+    if (seconds <= 0) {
+        return "00:00";
+    }
+    let days_s = "";
+    let hours_s = "";
+    let minutes_s = "00:";
+    let seconds_s = "00";
+    let is_seconds_less_than_20 = false;
+    if (seconds <= 20)
+        is_seconds_less_than_20 = true;
+
+    const seconds_in_day = 86400;
+    const seconds_in_hour = 3600;
+    const seconds_in_minute = 60;
+
+    let days_number = 0;
+    if (seconds > seconds_in_day) {
+        days_number = Math.floor(seconds / seconds_in_day);
+        seconds = seconds % seconds_in_day;
+    }
+    if (days_number > 0) {
+        days_s = String(days_number) + ":";
+    }
+
+    let hours_number = 0;
+    if (seconds >= seconds_in_hour) {
+        hours_number = Math.floor(seconds / seconds_in_hour);
+        seconds = seconds % seconds_in_hour;
+        console.log(hours_number);
+    }
+    if (hours_number > 0) {
+        hours_s = String(hours_number) + ":";
+    }
+
+    let minutes_number = 0;
+    if (seconds >= seconds_in_minute) {
+        minutes_number = Math.floor(seconds / seconds_in_minute);
+        seconds = seconds % seconds_in_minute;
+    }
+    if (minutes_number > 0) {
+        if (minutes_number >= 10)
+            minutes_s = String(minutes_number) + ":";
+        else if (minutes_number !== 0)
+            minutes_s = "0" + String(minutes_number) + ":";
+    }
+
+    if (seconds >= 10) {
+        if (is_seconds_less_than_20)
+            seconds_s = String(Math.floor(seconds).toFixed(1));
+        else
+            seconds_s = String(Math.floor(seconds).toFixed(0));
+    }
+    else if (seconds < 10 && seconds > 0) {
+        if (is_seconds_less_than_20)
+            seconds_s = "0" + String(Math.floor(seconds).toFixed(1));
+        else
+            seconds_s = "0" +String(Math.floor(seconds).toFixed(0));
+    }
+
+    return days_s + hours_s + minutes_s + seconds_s;
+}
+
+class Timer {
+    constructor(timer_view, full_time, additional_time_seconds) {
+        this.is_unpaused = false;
+        this.timer_view = timer_view;
+        this.current_time = null;
+        this.update_delay = 100;
+        this.full_time = full_time;
+        this.additional_time_seconds = additional_time_seconds;
+        this.timer_id_interval = null;
+    }
+
+    set_time_start() {
+        this.current_time = this.full_time;
+        this.timer_view.set_time(this.current_time);
+    }
+
+    set_time(seconds) {
+        this.current_time = seconds;
+        this.timer_view.set_time(this.current_time);
+    }
+
+    unpause() {
+        if (this.is_timer_over()) {
+            console.log("Timer is over");
+            return;
+        }
+        if (this.is_unpaused) {
+            return;
+        }
+        this.timer_id_interval = setInterval(this.update_time_minus_second, this.update_delay, this);
+        console.log(`My timer id = ${this.timer_id_interval}`);
+        this.timer_view.unpause();
+        this.is_unpaused = true;
+    }
+
+    pause() {
+        if (!this.is_unpaused) {
+            return;
+        }
+        console.log(`Interval id to clear: ${this.timer_id_interval}`);
+        clearInterval(this.timer_id_interval);
+        this.current_time += this.additional_time_seconds;
+        this.timer_view.set_time(this.current_time);
+        this.timer_view.pause();
+        this.is_unpaused = false;
+    }
+
+    on_zero() {
+        this.pause();
+        console.log("timer has reached the end");
+    }
+
+    update_time_minus_second(self) {
+        self.current_time -= 0.1;
+        self.timer_view.set_time(self.current_time);
+
+        if (self.current_time <= 0) {
+            self.on_zero();
+        }
+    }
+
+    is_timer_over() {
+        return this.current_time <= 0;
+    }
+}
+
+class TimerView {
+    constructor(timer_selector) {
+        this.timer_selector = timer_selector;
+    }
+
+    set_time(seconds) {
+        document.querySelector(this.timer_selector).innerHTML = get_timer_representation(seconds);
+    }
+
+    pause() {
+        document.querySelector(this.timer_selector).classList.remove("active");
+    }
+
+    unpause() {
+        document.querySelector(this.timer_selector).classList.add("active");
+    }
+}
+
+class OnlineTimer extends Timer {
+    constructor(timer_view, full_time, additional_time_seconds) {
+        super(timer_view, full_time, additional_time_seconds);
+        this.last_move_time = null;
+        this.time_on_clock = null
+    }
+
+    update_time_minus_second(self) {
+        if (!self.last_move_time)
+            return;
+        if (!self.time_on_clock)
+            return;
+        const now = new Date();
+        const diff = (now - self.last_move_time) / 1000;
+        self.current_time = self.time_on_clock - diff;
+        self.timer_view.set_time(self.current_time);
+
+        if (self.current_time <= 0) {
+            self.on_zero();
+        }
     }
 }

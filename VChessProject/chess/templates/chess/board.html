@@ -23,12 +23,14 @@
         <div class="user-data">
           <a>Black</a>
         </div>
-        <div class="timer-black">3:00</div>
+        <div class="timer-black" id="timer_black">3:00</div>
       </div>
     </div>
 
     <div class="board-chess-board-row">
-      <div class="chess-board" id="chessboard"></div>
+      <div class="chess-board" id="chessboard">
+        
+      </div>
       <div class="board-buttons-container">
         <button class="board-button" id="flip_board_button"><i class="fa-solid fa-repeat"></i></button>
       </div>
@@ -41,7 +43,7 @@
         <div class="user-data">
           <a>White</a>
         </div>
-        <div class="timer-white">3:00</div>
+        <div class="timer-white" id="timer_white">3:00</div>
       </div>
     </div>
   </div>
@@ -114,10 +116,10 @@
 
   {% include 'chess/parts/import_pieces_js.html' %}
   <script>
-    url_ajax_start_search = "{% url 'chess:ajax_start_search' %}"
-    url_ajax_cancel_search = "{% url 'chess:ajax_cancel_search' %}"
-    url_ajax_return_new_html_test = "{% url 'chess:ajax_return_new_html_test' %}"
-    basic_url = "{% url 'chess:home_page' %}"
+    const url_ajax_start_search = "{% url 'chess:ajax_start_search' %}"
+    const url_ajax_cancel_search = "{% url 'chess:ajax_cancel_search' %}"
+    const url_ajax_return_new_html_test = "{% url 'chess:ajax_return_new_html_test' %}"
+    const basic_url = "{% url 'chess:home_page' %}"
   </script>
   <script src="{% static 'chess/js/chess/right_menu/play.js' %}" defer></script>
   <script src="{% static 'chess/js/chess/pieces.js' %}" defer></script>

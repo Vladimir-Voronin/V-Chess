@@ -106,6 +106,13 @@ class OnlineGameView(LoginRequiredMixin, TemplateView):
     template_name = "chess/online_game.html"
 
     def get(self, request, game_id):
-        if not Game.objects.filter(id=game_id).first():
+        self.game = Game.objects.filter(id=game_id).first()
+        if not self.game:
             return HttpResponseRedirect(self.login_url)
         return super().get(request, game_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'full_time': self.game.game_search_settings.full_time,
+                        'additional_time_per_move': self.game.game_search_settings.time_per_move})
+        return context

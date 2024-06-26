@@ -500,7 +500,7 @@ class NotationView {
         else {
             move_to_delete.remove();
         }
-        
+
         while (sib) {
             let save = sib.nextSibling;
             sib.remove();
@@ -560,7 +560,6 @@ class OnlineNotation extends Notation {
     write_new_main_line(notation_node, chess_game) {
         this.websocket_obj.send(JSON.stringify({
             'type': "new_move",
-            'player_id': 1,
             'move_number': notation_node.move_number,
             'move_notation_uci': notation_node.uci,
             'color_is_white': notation_node.is_white
