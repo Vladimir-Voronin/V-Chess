@@ -1,0 +1,123 @@
+{% extends 'chess_app/default_layout.html' %}
+{% load static %}
+
+{% block title %}
+  Online game
+{% endblock %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <link type="text/css" href="{% static 'chess_app/css/buttons.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'chess_app/css/chess.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block right_container %}
+  <div class="empty-column-board-left"></div>
+
+  <div class="board-view-column">
+    <div class="user-bar-top" id="user_bar_top">
+      <div class="board-black-row">
+        <div class="user-avatar">
+          <img src="{% static 'chess_app/img/icons/no_avatar.png' %}" class="png-icon" />
+        </div>
+        <div class="user-data">
+          <a>Online Black</a>
+        </div>
+        <div class="timer-black" id="timer_black">10:00</div>
+      </div>
+    </div>
+
+    <div class="board-chess-board-row">
+      <div class="chess-board" id="chessboard"></div>
+      <div class="board-buttons-container">
+        <button class="board-button" id="flip_board_button"><i class="fa-solid fa-repeat"></i></button>
+      </div>
+    </div>
+    <div class="user-bar-bottom" id="user_bar_bottom">
+      <div class="board-white-row">
+        <div class="user-avatar">
+          <img src="{% static 'chess_app/img/icons/no_avatar.png' %}" class="png-icon" />
+        </div>
+        <div class="user-data">
+          <a>Online White</a>
+        </div>
+        <div class="timer-white" id="timer_white">10:00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-column-board-right"></div>
+
+  <div class="right-menu-column">
+    <div class="right-menu-container">
+      <div class="right-menu-buttons-container">
+        <div class="right-menu-button active" id="notation_button">
+          <span><i class="fa-solid fa-location-crosshairs"></i></span>
+          <span>Notation</span>
+        </div>
+        <div class="right-menu-button" id="play_menu_button">
+          <span><i class="fa-regular fa-square-plus"></i></span>
+          <span>Play</span>
+        </div>
+        <div class="right-menu-button" id="players_button">
+          <span><i class="fa-solid fa-users"></i></span>
+          <span>Players</span>
+        </div>
+      </div>
+      <div class="right-menu-content">
+        <div class="notation-container" id="notation_container">
+          <div class="notation-header">I'm a notation header</div>
+          <div class="notation-body" id="notation_body"></div>
+        </div>
+        <div class="play-container" id="play_container">
+          <div class="play-body">
+            <div class="play-body-row">Time controls</div>
+
+            <div class="play-body-row" id="time_controls_buttons">
+              <div class="time-control-button" id="timecontrol_3">3 min</div>
+              <div class="time-control-button" id="timecontrol_3_2">3 | 2</div>
+              <div class="time-control-button" id="timecontrol_15">15 min</div>
+            </div>
+            <div class="play-body-row">
+              <button class="big-button" id="test_button">Test</button>
+            </div>
+          </div>
+        </div>
+        <div class="players-container" id="players_container"></div>
+      </div>
+
+      <div class="right-menu-floor"></div>
+    </div>
+
+    <div class="under-menu-buttons-container">
+      <div class="move-button" id="first_move_button">
+        <i class="fas fa-backward-fast"></i>
+      </div>
+      <div class="move-button" id="previous_move_button">
+        <i class="fas fa-backward"></i>
+      </div>
+      <div class="move-button" id="next_move_button">
+        <i class="fa-solid fa-forward"></i>
+      </div>
+      <div class="move-button" id="last_main_line_move_button">
+        <i class="fa-solid fa-forward-fast"></i>
+      </div>
+    </div>
+  </div>
+
+  {% include 'chess_app/parts/import_pieces_js.html' %}
+  <script>
+    const full_time = Number('{{full_time}}');
+    const additional_time_per_move = Number('{{additional_time_per_move}}');
+  </script>
+  <script src="{% static 'chess_app/js/chess_app/online_game_websocket.js' %}" defer></script>
+  <script src="{% static 'chess_app/js/chess_app/pieces.js' %}" defer></script>
+  <script src="{% static 'chess_app/js/chess_app/pgn.js' %}" defer></script>
+  <script src="{% static 'chess_app/js/chess_app/right_menu.js' %}" defer></script>
+  <script src="{% static 'chess_app/js/chess_app/notation.js' %}" defer></script>
+  <script src="{% static 'chess_app/js/chess_app/chess_pieces_logic.js' %}" defer></script>
+  <script src="{% static 'chess_app/js/chess_app/chess_game_functions.js' %}" defer></script>
+  <script src="{% static 'chess_app/js/chess_app/chess_game.js' %}" defer></script>
+  <script src="{% static 'chess_app/js/chess_app/positions.js' %}" defer></script>
+  <script src="{% static 'chess_app/js/online_game.js' %}" defer></script>
+{% endblock %}

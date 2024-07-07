@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-!byg5o15ghrcta%i6r9(@@3phesp@*3ndl=%rpr^rww)z3_iq(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -38,8 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'chess.apps.ChessConfig'
+    'chess_app.apps.ChessAppConfig'
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'VChessProject.middlewares.LoggerMiddleWare'
 ]
 
 ROOT_URLCONF = 'VChessProject.urls'
@@ -138,7 +140,7 @@ LOGGING = {
         }
     },
     "loggers": {
-        "chess": {
+        "chess_app": {
             "handlers": ["console", "file_info", "file_warning"],
             "level": "INFO",
             "propogate": True

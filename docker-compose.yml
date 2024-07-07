@@ -1,0 +1,28 @@
+version: "3.7"
+
+services:
+  VChessDB:
+    image:
+      postgres:14
+    expose:
+      - "5434"
+    ports:
+      - "5434:5434"
+    environment:
+      - POSTGRES_PASSWORD="password"
+      - PGPORT=5434
+    command: -p 5434
+    volumes:
+      - postgres_data:/var/lib/postgres/data
+  vchess:
+    build: .
+    image: check3
+    command: python /usr/src/vchess/VChessProject/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/usr/src/vchess
+    ports:
+      - 8000:8000
+    depends_on:
+      - VChessDB
+volumes:
+  postgres_data:
