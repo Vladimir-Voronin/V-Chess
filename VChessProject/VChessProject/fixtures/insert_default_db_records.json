@@ -1,0 +1,69 @@
+[
+  {
+    "model": "chess_app.gametype",
+    "pk": "blitz",
+    "fields": {}
+  },
+  {
+    "model": "chess_app.gametype",
+    "pk": "bullet",
+    "fields": {}
+  },
+  {
+    "model": "chess_app.gametype",
+    "pk": "classic",
+    "fields": {}
+  },
+  {
+    "model": "chess_app.gametype",
+    "pk": "rapid",
+    "fields": {}
+  },
+  {
+    "model": "chess_app.gameresult",
+    "pk": "Black won",
+    "fields": {}
+  },
+  {
+    "model": "chess_app.gameresult",
+    "pk": "Canceled",
+    "fields": {}
+  },
+  {
+    "model": "chess_app.gameresult",
+    "pk": "Draw",
+    "fields": {}
+  },
+  {
+    "model": "chess_app.gameresult",
+    "pk": "White won",
+    "fields": {}
+  },
+  {
+    "model": "chess_app.gamesearchsettings",
+    "pk": 1,
+    "fields": {
+      "game_type": "blitz",
+      "full_time": 180,
+      "time_per_move": 0
+    }
+  },
+  {
+    "model": "chess_app.gamesearchsettings",
+    "pk": 2,
+    "fields": {
+      "game_type": "blitz",
+      "full_time": 180,
+      "time_per_move": 2
+    }
+  },
+  {
+    "model": "chess_app.gamesearchsettings",
+    "pk": 3,
+    "fields": {
+      "game_type": "rapid",
+      "full_time": 900,
+      "time_per_move": 0
+    }
+  }
+]

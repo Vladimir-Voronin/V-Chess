@@ -9,4 +9,9 @@ COPY . /usr/src/vchess
 
 EXPOSE 8000
 
-CMD ["python", "VChessProject/manage.py", "runserver", "0.0.0.0:8000"]
+CMD cd VChessProject && \
+    python manage.py makemigrations && \
+    python manage.py migrate && \
+    python manage.py loaddata VChessProject/fixtures/insert_default_db_records.json && \
+    python manage.py collectstatic --noinput && \
+    python manage.py runserver 0.0.0.0:8000

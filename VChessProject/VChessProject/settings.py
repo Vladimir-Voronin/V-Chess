@@ -10,8 +10,16 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 from . import hidden
+from dotenv import load_dotenv
+import mimetypes
+
+mimetypes.add_type("image/svg+xml", ".svg", True)
+mimetypes.add_type("image/svg+xml", ".svgz", True)
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +28,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!byg5o15ghrcta%i6r9(@@3phesp@*3ndl=%rpr^rww)z3_iq('
+SECRET_KEY = "django-insecure-!byg5o15ghrcta%i6r9(@@3phesp@*3ndl=%rpr^rww)z3_iq("
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG")
 
 ALLOWED_HOSTS = ["*"]
 
@@ -40,7 +48,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'chess_app.apps.ChessAppConfig'
 ]
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -72,20 +79,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'VChessProject.wsgi.application'
-
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'VChessDB',
-        'HOST': 'localhost',
-        'USER': 'postgres',
-        'PASSWORD': hidden.VCHESSDB_PASSWORD,
-        'PORT': 5434
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -162,14 +155,48 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, STATIC_URL)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-REDIS_HOST = 'localhost'
+# Database
+# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+POSTGRES_LOCAL_MACHINE_HOST = 'localhost'
+POSTGRES_DOCKER_MACHINE_HOST = 'vchess_db'
+# For local machine
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv("DB_NAME"),
+        'HOST': os.getenv("DB_HOST"),
+        'USER': os.getenv("DB_USER"),
+        'PASSWORD': os.getenv("DB_PASSWORD"),
+        'PORT': os.getenv("DB_PORT")
+    }
+}
+
+# For Docker
+# DOCKER_DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',
+#         'HOST': POSTGRES_DOCKER_MACHINE_HOST,
+#         'USER': 'postgres',
+#         'PASSWORD': hidden.VCHESSDB_PASSWORD,
+#         'PORT': 5434
+#     }
+# }
+#
+# DATABASES = LOCAL_DATABASES
+
+REDIS_HOST_LOCAL = 'localhost'
+REDIS_HOST_DOCKER = 'redis'
+REDIS_HOST = os.getenv("REDIS_HOST")
 REDIS_PORT = '6379'
+
 CELERY_BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
 CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
