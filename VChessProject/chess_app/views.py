@@ -12,7 +12,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView, FormView
 
 from .forms import SignUpForm, LoginForm
-from .models import Game
+from .models import Game, Rating
 from .tasks import add_player_to_search_queue, delete_player_from_search_queue, start_global_search
 
 logger = logging.getLogger(__name__)
@@ -105,7 +105,23 @@ class OnlineGameView(LoginRequiredMixin, TemplateView):
         return super().get(request, game_id)
 
     def get_context_data(self, **kwargs):
+        self.game = Game.objects.filter(id=self.kwargs['game_id']).first()
         context = super().get_context_data(**kwargs)
         context.update({'full_time': self.game.game_search_settings.full_time,
                         'additional_time_per_move': self.game.game_search_settings.time_per_move})
+        if self.game:
+            game_type = self.game.game_search_settings.game_type.name
+            player_white = self.game.chess_user_white
+            player_black = self.game.chess_user_black
+            rating_white_obj = Rating.objects.filter(chess_user=player_white, game_type=game_type)
+            rating_black_obj = Rating.objects.filter(chess_user=player_black, game_type=game_type)
+            rating_white = int(rating_white_obj[0].rating) if rating_white_obj else "-"
+            rating_black = int(rating_black_obj[0].rating) if rating_black_obj else "-"
+
+            context.update({
+                "player_white_name": player_white.user.username,
+                "player_black_name": player_black.user.username,
+                "player_white_rating": rating_white,
+                "player_black_rating": rating_black
+            })
         return context

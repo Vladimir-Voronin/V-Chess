@@ -48,6 +48,12 @@
 .user-data {
     font-size: 14px;
     padding: 8px 2px 0px 5px;
+    display: flex;
+}
+
+.user-rating {
+    color: gray;
+    padding-left: 3px;
 }
 
 .timer-black {

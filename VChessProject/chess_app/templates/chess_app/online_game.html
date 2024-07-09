@@ -21,7 +21,8 @@
           <img src="{% static 'chess_app/img/icons/no_avatar.png' %}" class="png-icon" />
         </div>
         <div class="user-data">
-          <a>Online Black</a>
+          <div class="user-name" id="black_username">{{ player_black_name }}</div>
+          <div class="user-rating" id="black_rating">({{ player_black_rating }})</div>
         </div>
         <div class="timer-black" id="timer_black">10:00</div>
       </div>
@@ -39,7 +40,8 @@
           <img src="{% static 'chess_app/img/icons/no_avatar.png' %}" class="png-icon" />
         </div>
         <div class="user-data">
-          <a>Online White</a>
+          <div class="user-name" id="white_username">{{ player_white_name }}</div>
+          <div class="user-rating" id="white_rating">({{ player_white_rating }})</div>
         </div>
         <div class="timer-white" id="timer_white">10:00</div>
       </div>
@@ -55,7 +57,6 @@
           <span><i class="fa-solid fa-location-crosshairs"></i></span>
           <span>Notation</span>
         </div>
-        
       </div>
       <div class="right-menu-content">
         <div class="notation-container" id="notation_container">
@@ -100,8 +101,8 @@
 
   {% include 'chess_app/parts/import_pieces_js.html' %}
   <script>
-    const full_time = Number('{{full_time}}');
-    const additional_time_per_move = Number('{{additional_time_per_move}}');
+    const full_time = Number('{{full_time}}')
+    const additional_time_per_move = Number('{{additional_time_per_move}}')
   </script>
   <script src="{% static 'chess_app/js/chess_app/online_game_websocket.js' %}" defer></script>
   <script src="{% static 'chess_app/js/chess_app/pieces.js' %}" defer></script>
