@@ -192,8 +192,6 @@ online_game_socket.onmessage = function (e) {
             console.log(`Exception type: ${data["exception_type"]}`);
             console.log(`Exception message: ${data["exception_message"]}`);
         case "game_end":
-            block_white = data["block_white"];
-            block_black = data["block_black"];
             chess_game.timer_white.stop();
             chess_game.timer_black.stop();
             if (block_black) {
@@ -207,6 +205,6 @@ online_game_socket.onmessage = function (e) {
             }
 
         default:
-            console.log("There is no such type of websocket message")
+            console.log("There is no such type of websocket message");
     }
 };

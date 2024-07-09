@@ -154,8 +154,6 @@ class OnlineGameConsumer(AsyncWebsocketConsumer):
                 "draw_reason": draw_reason,
                 "is_white_won": is_white_won,
                 "win_reason": win_reason,
-                "block_white": self.block_white,
-                "block_black": self.block_black,
                 "white_rating_change": change_elo_white,
                 "black_rating_change": change_elo_black,
             }
