@@ -4,16 +4,9 @@ const notation_bind = new RightMenuBind(
     document.querySelector("#notation_button"),
     document.querySelector("#notation_container")
 );
-const play_bind = new RightMenuBind(
-    document.querySelector("#play_menu_button"),
-    document.querySelector("#play_container")
-);
-const players_bind = new RightMenuBind(
-    document.querySelector("#players_button"),
-    document.querySelector("#players_container")
-);
 
-const right_menu_view = new RightMenuView([notation_bind, play_bind, players_bind]);
+const right_menu_view = new RightMenuView([notation_bind]);
+
 const notation_view = new NotationView(
     document.querySelector("#notation_body")
 );
