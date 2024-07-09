@@ -23,7 +23,7 @@ services:
   vchess:
     build:
       context: .
-    image: check5
+    image: check7
     working_dir: /usr/src/vchess
     volumes:
       - .:/usr/src/vchess
@@ -56,7 +56,26 @@ services:
     command: celery -A VChessProject worker -l info -P threads
     environment:
       REDIS_HOST: redis
-
+    depends_on:
+      - redis
+      - vchess
+      - vchess_db
+  daphne:
+    build: .
+    working_dir: /usr/src/vchess/VChessProject
+    command: daphne -b 0.0.0.0 -p 8001 VChessProject.asgi:application
+    environment:
+      - DEBUG=FALSE
+      - DB_NAME=VChessDB
+      - DB_HOST=vchess_db
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_PORT=5432
+      - REDIS_HOST=redis
+    ports:
+      - 8001:8001
+    depends_on:
+      - redis
 volumes:
   static_volume:
   postgres_data:

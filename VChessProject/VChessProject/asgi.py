@@ -13,12 +13,16 @@ from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
-
-from chess_app.routing import websocket_urlpatterns
+import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'VChessProject.settings')
 
+django.setup()
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+
 django_asgi_app = get_asgi_application()
+
+from chess_app.routing import websocket_urlpatterns
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,

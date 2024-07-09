@@ -34,7 +34,7 @@ SECRET_KEY = "django-insecure-!byg5o15ghrcta%i6r9(@@3phesp@*3ndl=%rpr^rww)z3_iq(
 DEBUG = os.getenv("DEBUG")
 
 ALLOWED_HOSTS = ["*"]
-
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://localhost:81", "http://127.0.0.1:81"]
 # Application definition
 
 INSTALLED_APPS = [
