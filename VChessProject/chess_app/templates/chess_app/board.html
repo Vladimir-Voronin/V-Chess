@@ -14,41 +14,7 @@
 {% block right_container %}
   <div class="empty-column-board-left"></div>
 
-  <div class="board-view-column">
-    <div class="user-bar-top" id="user_bar_top">
-      <div class="board-black-row">
-        <div class="user-avatar">
-          <img src="{% static 'chess_app/img/icons/no_avatar.png' %}" class="png-icon" />
-        </div>
-        <div class="user-data">
-          <div class="user-name">Black</div>
-          <div class="user-rating">(1200)</div>
-        </div>
-        <div class="timer-black" id="timer_black">3:00</div>
-      </div>
-    </div>
-
-    <div class="board-chess-board-row">
-      <div class="chess-board" id="chessboard">
-        
-      </div>
-      <div class="board-buttons-container">
-        <button class="board-button" id="flip_board_button"><i class="fa-solid fa-repeat"></i></button>
-      </div>
-    </div>
-    <div class="user-bar-bottom" id="user_bar_bottom">
-      <div class="board-white-row">
-        <div class="user-avatar">
-          <img src="{% static 'chess_app/img/icons/no_avatar.png' %}" class="png-icon" />
-        </div>
-        <div class="user-data">
-          <div class="user-name">White</div>
-          <div class="user-rating">(1200)</div>
-        </div>
-        <div class="timer-white" id="timer_white">3:00</div>
-      </div>
-    </div>
-  </div>
+  {% include 'chess_app/parts/base_board.html' %}
 
   <div class="empty-column-board-right"></div>
 

@@ -8,6 +8,7 @@ urlpatterns = [
     path("login", views.LogInView.as_view(), name="log-in"),
     path("logout", views.logout_view, name="log-out"),
     path("board", views.BoardView.as_view(), name="board"),
+    path("play", views.PlayView.as_view(), name="play"),
     path("live/<int:game_id>", views.OnlineGameView.as_view(), name="online_game"),
 ]
 

@@ -5,6 +5,7 @@ from pathlib import Path
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -12,7 +13,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView, FormView
 
 from .forms import SignUpForm, LoginForm
-from .models import Game, Rating
+from .models import Game, Rating, ChessUser
 from .tasks import add_player_to_search_queue, delete_player_from_search_queue, start_global_search
 
 logger = logging.getLogger(__name__)
@@ -105,7 +106,6 @@ class OnlineGameView(LoginRequiredMixin, TemplateView):
         return super().get(request, game_id)
 
     def get_context_data(self, **kwargs):
-        self.game = Game.objects.filter(id=self.kwargs['game_id']).first()
         context = super().get_context_data(**kwargs)
         context.update({'full_time': self.game.game_search_settings.full_time,
                         'additional_time_per_move': self.game.game_search_settings.time_per_move})
@@ -125,3 +125,19 @@ class OnlineGameView(LoginRequiredMixin, TemplateView):
                 "player_black_rating": rating_black
             })
         return context
+
+
+class PlayView(LoginRequiredMixin, TemplateView):
+    login_url = reverse_lazy('chess_app:log-in')
+    template_name = "chess_app/play_page.html"
+
+    def get(self, request):
+        print(f"YO: {request}")
+        user = User.objects.get(username=request.user)
+        chess_user = ChessUser.objects.get(user=user)
+        active_game_list = Game.objects.filter(Q(chess_user_white=chess_user) | Q(chess_user_black=chess_user),
+                                               is_active=True)
+        if active_game_list:
+            active_game = active_game_list[0]
+            return HttpResponseRedirect(reverse('chess_app:online_game', kwargs={"game_id": active_game.pk}))
+        return super().get(request)
