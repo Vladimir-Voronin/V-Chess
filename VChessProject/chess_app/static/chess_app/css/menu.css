@@ -1,0 +1,99 @@
+@import url('colors.css');
+
+.left-menu {
+    background-color: var(--v_grey_left_menu);
+    display: flex;
+    flex-direction: column;
+    min-width: 110px;
+    font-weight: 700;
+}
+
+.top-menu-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.bottom-menu-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+}
+
+.menu-item {
+    text-decoration: none;
+    color: var(--v_white_text);
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.menu-item:hover {
+    background-color: var(--v_grey_addit_menu);
+}
+
+.menu-item:visited {
+    color: var(--v_white_text);
+}
+
+.menu-item-bottom {
+    font-size: 14px;
+    color: var(--v_grey_text);
+}
+
+.menu-item-bottom:visited {
+    color: var(--v_grey_text);
+}
+
+.menu-icon-left {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 100%;
+    padding-left: 4px;
+}
+
+.menu-item-text {
+    display: flex;
+    justify-content: left;
+    text-indent: 8px;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.menu-username {
+    justify-content: center;
+    text-indent: 0px;
+}
+
+.margin-left-icon {
+    margin-left: 15px;
+}
+
+.right-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+.icon-red {
+    color: red;
+}
+.icon-blue {
+    color: blue;
+}
+
+.icon-white {
+    color: white;
+}
+
+.icon-green {
+    color: var(--v_green);
+}
+
+.png-icon-board {
+    background-color: white;
+    width: 20px;
+}

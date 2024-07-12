@@ -1,0 +1,82 @@
+version: "3.7"
+
+services:
+  redis:
+    image:
+      redis:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/var/lib/redis/data
+  vchess_db:
+    image:
+      postgres:14
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=VChessDB
+      - POSTGRES_USER=postgres
+    volumes:
+      - postgres_data:/var/lib/postgres/data
+  vchess:
+    build:
+      context: .
+    image: check7
+    working_dir: /usr/src/vchess
+    volumes:
+      - .:/usr/src/vchess
+      - static_volume:/usr/src/vchess/VChessProject/static
+    ports:
+      - 8000:8000
+    environment:
+      - DEBUG=FALSE
+      - DB_NAME=VChessDB
+      - DB_HOST=vchess_db
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_PORT=5432
+      - REDIS_HOST=redis
+    depends_on:
+      - vchess_db
+      - redis
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./conf/nginx.conf:/etc/nginx/nginx.conf
+      - static_volume:/static
+    ports:
+      - 80:80
+    depends_on:
+      - vchess
+  worker:
+    build: .
+    working_dir: /usr/src/vchess/VChessProject
+    command: celery -A VChessProject worker -l info -P threads
+    environment:
+      REDIS_HOST: redis
+    depends_on:
+      - redis
+      - vchess
+      - vchess_db
+  daphne:
+    build: .
+    working_dir: /usr/src/vchess/VChessProject
+    command: daphne -b 0.0.0.0 -p 8001 VChessProject.asgi:application
+    environment:
+      - DEBUG=FALSE
+      - DB_NAME=VChessDB
+      - DB_HOST=vchess_db
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_PORT=5432
+      - REDIS_HOST=redis
+    ports:
+      - 8001:8001
+    depends_on:
+      - redis
+volumes:
+  static_volume:
+  postgres_data:
+  redis_data:

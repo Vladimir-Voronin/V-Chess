@@ -1,0 +1,36 @@
+{% extends 'chess_app/default_layout.html' %}
+{% load static %}
+
+{% block title %}
+  <title>Log In</title>
+{% endblock %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <link type="text/css" href="{% static 'chess_app/css/auth.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'chess_app/css/buttons.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block right_container %}
+  <div class="sign-up-field">
+    <h2>Log In</h2>
+    <form action="" method="post">
+      {% csrf_token %}
+      {% if form.errors %}
+        {% for k, v in form.errors.items %}
+          {% for error in v %}
+            <div class="auth-error"><li>{{ error }}</li></div>
+          {% endfor %}
+        {% endfor %}
+      {% endif %}
+
+      {% for field in form %}
+        <div class="auth-row">
+          {% comment %} <label class="auth-label" for="{{ field.auto_id }}">{{ field.label }}</label> {% endcomment %}
+          {{ field }}
+        </div>
+      {% endfor %}
+      <button class="big-button" type="submit">Log In</button>
+    </form>
+  </div>
+{% endblock %}
